@@ -1,0 +1,1449 @@
+<!DOCTYPE html>
+<html lang="ca" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>POS · Diagnosi d'automatització</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg:#f2f0eb; --surface:#fff; --sf2:#eceae3;
+  --bd:rgba(0,0,0,0.09); --bd2:rgba(0,0,0,0.15);
+  --text:#1a1917; --text2:#6b6866; --text3:#a09e9a;
+  --blue:#1a6fc4; --blue-bg:rgba(26,111,196,0.10); --blue-bd:rgba(26,111,196,0.32);
+  --teal:#0f7a5a; --teal-bg:rgba(15,122,90,0.10);  --teal-bd:rgba(15,122,90,0.32);
+  --purple:#6d4fc7; --pur-bg:rgba(109,79,199,0.10); --pur-bd:rgba(109,79,199,0.32);
+  --gray:#5e5d59; --gray-bg:rgba(94,93,89,0.09);   --gray-bd:rgba(94,93,89,0.26);
+  --red:#d63232;  --red-bg:rgba(214,50,50,0.09);   --red-bd:rgba(214,50,50,0.32);
+  --amber:#b87000; --amb-bg:rgba(184,112,0,0.08);  --amb-bd:rgba(184,112,0,0.28);
+  --green:#1a7a3c; --grn-bg:rgba(26,122,60,0.08);  --grn-bd:rgba(26,122,60,0.28);
+  --font-h:'Syne',sans-serif; --font:'DM Sans',sans-serif; --mono:'DM Mono',monospace;
+}
+[data-theme="dark"]{
+  --bg:#0f0f0e; --surface:#1a1a18; --sf2:#212120;
+  --bd:rgba(255,255,255,0.07); --bd2:rgba(255,255,255,0.13);
+  --text:#eeebe4; --text2:#9c9a94; --text3:#6a6865;
+  --blue:#5baaf5;   --blue-bg:rgba(91,170,245,0.11);  --blue-bd:rgba(91,170,245,0.30);
+  --teal:#34d4a0;   --teal-bg:rgba(52,212,160,0.11);  --teal-bd:rgba(52,212,160,0.30);
+  --purple:#b09cf8; --pur-bg:rgba(176,156,248,0.11);  --pur-bd:rgba(176,156,248,0.30);
+  --gray:#9e9c98;   --gray-bg:rgba(158,156,152,0.11); --gray-bd:rgba(158,156,152,0.26);
+  --red:#ff5c5c;    --red-bg:rgba(255,92,92,0.11);    --red-bd:rgba(255,92,92,0.34);
+  --amber:#f5a623;  --amb-bg:rgba(245,166,35,0.10);   --amb-bd:rgba(245,166,35,0.30);
+  --green:#3dba6e;  --grn-bg:rgba(61,186,110,0.10);   --grn-bd:rgba(61,186,110,0.28);
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13px;overflow:hidden;height:100vh;}
+
+/* ═══════════════════════════════════════════
+   TOP NAV (tabs)
+═══════════════════════════════════════════ */
+.topnav{
+  display:flex;align-items:stretch;
+  background:var(--surface);
+  border-bottom:1px solid var(--bd2);
+  height:48px;
+  position:relative;z-index:300;
+  gap:0;
+}
+.nav-brand{
+  display:flex;align-items:center;gap:10px;
+  padding:0 18px;
+  border-right:1px solid var(--bd2);
+  font-family:var(--font-h);font-size:13px;font-weight:700;
+  white-space:nowrap;
+}
+.nav-brand .dot{
+  width:8px;height:8px;border-radius:50%;background:var(--teal);flex-shrink:0;
+}
+.tab-nav{display:flex;align-items:stretch;flex:1;}
+.tab-btn{
+  display:flex;align-items:center;gap:7px;
+  padding:0 20px;
+  font-family:var(--font);font-size:12px;font-weight:500;
+  color:var(--text3);background:transparent;border:none;
+  cursor:pointer;border-bottom:2px solid transparent;
+  transition:all .13s;white-space:nowrap;
+}
+.tab-btn:hover{color:var(--text2);}
+.tab-btn.active{color:var(--teal);border-bottom-color:var(--teal);}
+.tab-btn .tb{
+  font-size:9px;font-family:var(--mono);
+  padding:2px 5px;border-radius:3px;
+  background:var(--sf2);color:var(--text3);
+  transition:all .13s;
+}
+.tab-btn.active .tb{background:var(--teal-bg);color:var(--teal);}
+.nav-actions{display:flex;align-items:center;gap:6px;padding:0 14px;margin-left:auto;}
+
+.btn{
+  font-family:var(--font);font-size:11px;font-weight:500;
+  padding:5px 12px;border-radius:5px;
+  border:1px solid var(--bd2);background:var(--sf2);color:var(--text2);
+  cursor:pointer;transition:all .12s;display:flex;align-items:center;gap:5px;white-space:nowrap;
+}
+.btn:hover{color:var(--text);background:var(--surface);}
+.btn-teal{background:var(--teal-bg);border-color:var(--teal-bd);color:var(--teal);}
+.btn-teal:hover{opacity:.82;}
+.btn-red{background:var(--red-bg);border-color:var(--red-bd);color:var(--red);}
+
+/* ═══════════════════════════════════════════
+   PANELS (one per tab)
+═══════════════════════════════════════════ */
+.panel{display:none;height:calc(100vh - 48px);}
+.panel.active{display:flex;flex-direction:column;}
+
+/* ═══════════════════════════════════════════
+   ── FLUX TAB ──
+═══════════════════════════════════════════ */
+.flux-layout{display:flex;flex:1;overflow:hidden;}
+
+/* sidebar */
+.sidebar{
+  width:190px;flex-shrink:0;
+  border-right:1px solid var(--bd2);
+  background:var(--surface);
+  display:flex;flex-direction:column;overflow:hidden;z-index:200;
+}
+.sb-head{
+  padding:9px 12px 6px;
+  font-family:var(--mono);font-size:9px;font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--text3);
+  border-bottom:1px solid var(--bd);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.sb-filters{display:flex;gap:3px;padding:7px 8px 4px;flex-wrap:wrap;}
+.flt{font-size:9px;font-family:var(--mono);padding:2px 6px;
+  border-radius:10px;border:1px solid var(--bd2);background:transparent;
+  color:var(--text3);cursor:pointer;transition:all .12s;}
+.flt.on{border-color:var(--teal-bd);background:var(--teal-bg);color:var(--teal);}
+.pool{flex:1;overflow-y:auto;padding:5px 7px 10px;display:flex;flex-direction:column;gap:4px;}
+
+.pool-item{
+  padding:6px 8px;border-radius:5px;border:1px solid;
+  font-size:10px;line-height:1.4;cursor:grab;
+  position:relative;user-select:none;transition:opacity .12s;
+}
+.pool-item.used{opacity:.28;pointer-events:none;}
+.pool-item .pt{font-weight:600;margin-bottom:1px;}
+.pool-item .ps{font-size:9px;opacity:.7;}
+.pain-dot{
+  position:absolute;top:-4px;right:-4px;
+  width:12px;height:12px;background:var(--red);
+  border-radius:50%;font-size:7px;color:#fff;
+  display:flex;align-items:center;justify-content:center;font-weight:700;}
+
+.p-blue  {background:var(--blue-bg);border-color:var(--blue-bd);color:var(--blue);}
+.p-teal  {background:var(--teal-bg);border-color:var(--teal-bd);color:var(--teal);}
+.p-purple{background:var(--pur-bg); border-color:var(--pur-bd); color:var(--purple);}
+.p-gray  {background:var(--gray-bg);border-color:var(--gray-bd);color:var(--gray);}
+
+/* canvas */
+.canvas-wrap{flex:1;position:relative;overflow:hidden;}
+#svg-layer{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1;overflow:visible;}
+.canvas-content{position:absolute;top:0;left:0;width:100%;height:100%;transform-origin:0 0;}
+
+.node{
+  position:absolute;width:140px;padding:8px 22px 8px 9px;
+  border-radius:6px;border:1px solid;font-size:10px;line-height:1.4;
+  cursor:grab;user-select:none;-webkit-user-select:none;
+  z-index:50;box-shadow:0 2px 8px rgba(0,0,0,.10);transition:box-shadow .12s;
+}
+.node:hover{box-shadow:0 4px 16px rgba(0,0,0,.15);}
+.node.dragging-node{cursor:grabbing;box-shadow:0 8px 24px rgba(0,0,0,.20);z-index:100;}
+.node .nt{font-weight:600;margin-bottom:1px;font-size:10px;pointer-events:none;}
+.node .ns{font-size:9px;opacity:.7;pointer-events:none;}
+.node .nd{position:absolute;top:-5px;right:-5px;width:13px;height:13px;background:var(--red);
+  border-radius:50%;font-size:7px;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;pointer-events:none;}
+.node .del{position:absolute;top:3px;right:3px;background:none;border:none;cursor:pointer;
+  font-size:12px;line-height:1;color:inherit;opacity:.2;padding:0 2px;transition:opacity .12s;font-family:var(--font);}
+.node .del:hover{opacity:.9;}
+
+.node .port{
+  position:absolute;width:14px;height:14px;border-radius:50%;
+  border:2px solid var(--teal);background:var(--surface);
+  cursor:crosshair;z-index:60;opacity:0;transition:opacity .15s,transform .15s,background .15s;
+}
+.node .port[data-side="right"]{right:-7px;top:50%;transform:translateY(-50%);}
+.node .port[data-side="left"] {left:-7px; top:50%;transform:translateY(-50%);}
+.node .port[data-side="top"]  {top:-7px;  left:50%;transform:translateX(-50%);}
+.node .port[data-side="bottom"]{bottom:-7px;left:50%;transform:translateX(-50%);}
+.connect-mode .node .port{opacity:1;}
+.connect-mode .node .port[data-side="right"]:hover {background:var(--teal);transform:translateY(-50%) scale(1.3);}
+.connect-mode .node .port[data-side="left"]:hover  {background:var(--teal);transform:translateY(-50%) scale(1.3);}
+.connect-mode .node .port[data-side="top"]:hover   {background:var(--teal);transform:translateX(-50%) scale(1.3);}
+.connect-mode .node .port[data-side="bottom"]:hover{background:var(--teal);transform:translateX(-50%) scale(1.3);}
+
+.pan-mode .canvas-content{cursor:grab;}
+.pan-mode .node{pointer-events:none;}
+.pan-mode.panning .canvas-content{cursor:grabbing;}
+body.dragging-active{user-select:none;-webkit-user-select:none;cursor:grabbing!important;}
+
+#temp-line{stroke:#0f7a5a;stroke-width:2;stroke-dasharray:5 4;fill:none;opacity:.7;}
+[data-theme="dark"] #temp-line{stroke:#34d4a0;}
+
+/* toolbar */
+.toolbar{
+  position:absolute;bottom:14px;left:50%;transform:translateX(-50%);
+  display:flex;gap:8px;align-items:center;
+  background:var(--surface);border:1px solid var(--bd2);
+  border-radius:30px;padding:6px 14px;
+  box-shadow:0 4px 20px rgba(0,0,0,.12);z-index:200;
+}
+.tool-hint{font-size:10px;color:var(--text3);font-family:var(--mono);}
+
+/* FAB group */
+.fab-group{
+  position:absolute;bottom:24px;right:20px;
+  display:flex;gap:16px;z-index:200;
+}
+.fab-item{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+}
+.fab-btn{
+  width:44px;height:44px;border-radius:50%;
+  color:#fff;font-size:26px;font-weight:300;
+  border:none;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.20);
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .15s,box-shadow .15s,background .15s;
+}
+.fab-pain{background:var(--red);}
+.fab-doc{background:var(--blue);}
+.fab-btn:hover{transform:scale(1.1);box-shadow:0 6px 22px rgba(0,0,0,.25);}
+.fab-label{
+  font-size:9px;font-weight:700;color:var(--text2);
+  background:var(--surface);padding:3px 8px;border-radius:12px;
+  border:1px solid var(--bd2);box-shadow:0 2px 6px rgba(0,0,0,0.06);
+  white-space:nowrap;user-select:none;
+}
+
+/* Document badge in nodes */
+.doc-badge {
+  display:inline-block;font-size:8px;font-family:var(--mono);font-weight:700;
+  text-transform:uppercase;padding:1px 5px;border-radius:4px;margin-bottom:4px;
+}
+.doc-badge-word {
+  background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-bd);
+}
+.doc-badge-excel {
+  background:var(--grn-bg);color:var(--green);border:1px solid var(--grn-bd);
+}
+.doc-badge-db {
+  background:var(--pur-bg);color:var(--purple);border:1px solid var(--pur-bd);
+}
+
+/* Document types in modal */
+.doc-type-opts {
+  display:flex;gap:8px;margin-top:5px;margin-bottom:12px;
+}
+.doc-type-opt {
+  flex:1;padding:8px 6px;border-radius:6px;text-align:center;
+  font-size:11px;font-weight:500;border:1px solid var(--bd2);
+  background:var(--sf2);color:var(--text2);cursor:pointer;transition:all .12s;
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+}
+.doc-type-opt:hover {
+  border-color:var(--teal-bd);color:var(--teal);background:var(--surface);
+}
+.doc-type-opt.sel-word {
+  background:var(--blue-bg);border-color:var(--blue-bd);color:var(--blue);
+}
+.doc-type-opt.sel-excel {
+  background:var(--grn-bg);border-color:var(--grn-bd);color:var(--green);
+}
+.doc-type-opt.sel-db {
+  background:var(--pur-bg);border-color:var(--pur-bd);color:var(--purple);
+}
+
+/* Typology pills in editor */
+.typo-pill {
+  padding:5px 11px;border-radius:20px;font-size:11px;font-weight:500;
+  border:1px solid var(--bd2);background:var(--sf2);color:var(--text2);
+  cursor:pointer;transition:all .12s;user-select:none;margin-bottom:4px;
+  display:inline-block;
+}
+.typo-pill:hover{border-color:var(--teal-bd);color:var(--teal);}
+.typo-pill.sel-dades_repetitives { background:rgba(26,110,196,0.12); border-color:rgba(26,110,196,0.3); color:var(--blue); }
+.typo-pill.sel-sempre_aixi       { background:rgba(184,112,0,0.12); border-color:rgba(184,112,0,0.3); color:var(--amber); }
+.typo-pill.sel-dificultat_alta   { background:rgba(109,79,199,0.12); border-color:rgba(109,79,199,0.3); color:var(--purple); }
+.typo-pill.sel-queixa_ciutadania { background:rgba(214,50,50,0.12); border-color:rgba(214,50,50,0.3); color:var(--red); }
+
+/* ═══════════════════════════════════════════
+   ── FITXES TAB ──
+═══════════════════════════════════════════ */
+.fitxa-layout{display:flex;flex:1;overflow:hidden;}
+
+.fitxa-sidebar{
+  width:220px;flex-shrink:0;
+  border-right:1px solid var(--bd2);
+  background:var(--surface);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.fsb-head{
+  padding:10px 14px 7px;
+  font-family:var(--mono);font-size:9px;font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--text3);
+  border-bottom:1px solid var(--bd);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.fitxa-list{flex:1;overflow-y:auto;padding:6px;}
+.fitxa-item{
+  padding:9px 11px;border-radius:6px;cursor:pointer;
+  border:1px solid transparent;margin-bottom:3px;
+  display:flex;flex-direction:column;gap:2px;transition:background .12s;
+}
+.fitxa-item:hover{background:var(--sf2);}
+.fitxa-item.active{background:var(--red-bg);border-color:var(--red-bd);}
+.fi-num{font-size:9px;font-family:var(--mono);color:var(--text3);}
+.fi-name{font-size:12px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.fi-lane{font-size:10px;color:var(--text3);}
+.fitxa-item.active .fi-name{color:var(--red);}
+.fsb-footer{padding:10px;border-top:1px solid var(--bd);font-size:10px;color:var(--text3);text-align:center;}
+
+.fitxa-editor{flex:1;overflow-y:auto;padding:24px;}
+
+.empty-state{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  height:100%;gap:12px;color:var(--text3);text-align:center;padding:60px 20px;
+}
+.empty-icon{font-size:36px;opacity:.4;}
+
+/* form */
+.form-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;gap:12px;}
+.form-id{font-size:10px;font-family:var(--mono);color:var(--text3);background:var(--sf2);border:1px solid var(--bd);padding:3px 8px;border-radius:4px;white-space:nowrap;}
+.field{margin-bottom:16px;}
+.field label,.flabel{display:block;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);margin-bottom:5px;}
+.field-hint{font-size:11px;color:var(--text3);margin-bottom:5px;margin-top:-3px;line-height:1.5;}
+.field input[type=text],.field textarea,.field select{
+  width:100%;padding:8px 10px;border-radius:6px;border:1px solid var(--bd2);
+  background:var(--surface);color:var(--text);font-family:var(--font);font-size:12px;
+  outline:none;transition:border-color .12s;line-height:1.5;
+}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--teal);}
+.field textarea{resize:vertical;min-height:68px;}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.divider{border:none;border-top:1px solid var(--bd);margin:18px 0;}
+
+.tech-group{display:flex;gap:6px;flex-wrap:wrap;}
+.tech-pill{
+  padding:5px 11px;border-radius:20px;font-size:11px;font-weight:500;
+  border:1px solid var(--bd2);background:var(--sf2);color:var(--text2);
+  cursor:pointer;transition:all .12s;user-select:none;
+}
+.tech-pill:hover{border-color:var(--teal-bd);color:var(--teal);}
+.tech-pill.sel-rpa    {background:var(--teal-bg);border-color:var(--teal-bd);color:var(--teal);}
+.tech-pill.sel-aaa    {background:var(--blue-bg);border-color:var(--blue-bd);color:var(--blue);}
+.tech-pill.sel-ia     {background:var(--amb-bg); border-color:var(--amb-bd); color:var(--amber);}
+.tech-pill.sel-eliminar{background:var(--red-bg);border-color:var(--red-bd);color:var(--red);}
+.tech-pill.sel-humana {background:var(--sf2);border-color:var(--bd2);color:var(--text2);font-style:italic;}
+
+.risk-group{display:flex;gap:6px;}
+.risk-opt{
+  flex:1;padding:7px 6px;border-radius:6px;text-align:center;
+  font-size:11px;font-weight:500;border:1px solid var(--bd2);
+  background:var(--sf2);color:var(--text2);cursor:pointer;transition:all .12s;
+}
+.risk-opt.sel-baix {background:var(--grn-bg);border-color:var(--grn-bd);color:var(--green);}
+.risk-opt.sel-mitja{background:var(--amb-bg);border-color:var(--amb-bd);color:var(--amber);}
+.risk-opt.sel-alt  {background:var(--red-bg);border-color:var(--red-bd);color:var(--red);}
+
+/* ═══════════════════════════════════════════
+   SHARED MODALS
+═══════════════════════════════════════════ */
+.modal-back{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.52);z-index:500;
+  align-items:center;justify-content:center;
+}
+.modal-back.open{display:flex;}
+.modal{
+  background:var(--surface);border:1px solid var(--bd2);
+  border-radius:12px;padding:22px;width:360px;
+  animation:su .16s ease;
+}
+@keyframes su{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal h3{font-size:14px;font-weight:600;margin-bottom:4px;}
+.modal p{font-size:11px;color:var(--text2);margin-bottom:14px;line-height:1.5;}
+.mlabel{font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--text2);display:block;margin-bottom:5px;}
+.modal input[type=text]{
+  width:100%;padding:8px 10px;border-radius:6px;border:1px solid var(--bd2);
+  background:var(--sf2);color:var(--text);font-family:var(--font);font-size:12px;
+  outline:none;transition:border-color .12s;margin-bottom:2px;
+}
+.modal input[type=text]:focus{border-color:var(--teal);}
+.lane-opts{display:flex;flex-direction:column;gap:4px;}
+.lane-opt{
+  padding:7px 11px;border-radius:6px;border:1px solid var(--bd2);
+  font-size:11px;cursor:pointer;color:var(--text2);transition:all .12s;background:var(--sf2);
+}
+.lane-opt:hover{border-color:var(--teal-bd);color:var(--teal);}
+.lane-opt.sel-blue  {background:var(--blue-bg);border-color:var(--blue-bd);color:var(--blue);}
+.lane-opt.sel-teal  {background:var(--teal-bg);border-color:var(--teal-bd);color:var(--teal);}
+.lane-opt.sel-purple{background:var(--pur-bg); border-color:var(--pur-bd); color:var(--purple);}
+.lane-opt.sel-gray  {background:var(--gray-bg);border-color:var(--gray-bd);color:var(--gray);}
+.lane-opt.sel-sys   {background:var(--gray-bg);border-color:var(--gray-bd);color:var(--gray);}
+.pain-toggle{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text2);cursor:pointer;margin-top:12px;margin-bottom:14px;}
+/* Procediment Tipus Tab Styles */
+#canvas-tipus {
+  flex:1;
+  position:relative;
+  overflow:hidden;
+  background:var(--bg);
+}
+#svg-layer-tipus {
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  pointer-events:none;
+  z-index:20;
+  overflow:visible;
+}
+.swimlanes-bg {
+  position:absolute;
+  top:0;
+  left:0;
+  width:7500px; /* Wide enough for 40 columns spaced at 180px */
+  height:700px; /* 5 lanes * 140px = 700px */
+  display:flex;
+  flex-direction:column;
+  pointer-events:none;
+  z-index:5;
+}
+.lane-bg {
+  height:140px;
+  border-bottom:1px dashed var(--bd2);
+  position:relative;
+  box-sizing:border-box;
+}
+.lane-bg:nth-child(even) {
+  background:rgba(0,0,0,0.015);
+}
+[data-theme="dark"] .lane-bg:nth-child(even) {
+  background:rgba(255,255,255,0.01);
+}
+.lane-bg .lane-title {
+  position:absolute;
+  top:12px;
+  left:20px;
+  font-size:10px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:0.08em;
+  opacity:0.35;
+}
+
+@media print{
+  .topnav,.fab-group,.toolbar,.modal-back,.fsb-footer,.form-header .form-actions{display:none!important;}
+  .panel{display:flex!important;height:auto!important;}
+  .canvas-wrap{overflow:visible;}
+  .fitxa-sidebar{display:none!important;}
+  .fitxa-editor{padding:0;}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ TOP NAV ══ -->
+<nav class="topnav">
+  <div class="nav-brand"><span class="dot"></span>POS · Diagnosi</div>
+  <div class="tab-nav">
+    <button class="tab-btn active" id="tab-flux" onclick="switchTab('flux')">
+      <span>Diagrama de flux</span><span class="tb">Art. 159 LCSP</span>
+    </button>
+    <button class="tab-btn" id="tab-fitxa" onclick="switchTab('fitxa')">
+      <span>Fitxes de punt de dolor</span><span class="tb" id="fitxa-count">0</span>
+    </button>
+    <button class="tab-btn" id="tab-tipus" onclick="switchTab('tipus')">
+      <span>Procediment tipus</span><span class="tb">Estàndard LCSP</span>
+    </button>
+  </div>
+  <div class="nav-actions">
+    <button class="btn" id="theme-btn" onclick="toggleTheme()">☾</button>
+    <button class="btn" id="connect-btn" onclick="toggleConnectMode()">⟶ Connectar</button>
+    <button class="btn" id="clear-conns-btn" onclick="clearLines()">✕ Connexions</button>
+    <button class="btn" id="clear-all-btn" onclick="clearAll()">↺ Reiniciar</button>
+    <button class="btn btn-teal" onclick="printCurrent()">🖨</button>
+  </div>
+</nav>
+
+<!-- ══ FLUX PANEL ══ -->
+<div class="panel active" id="panel-flux">
+  <div class="flux-layout">
+    <div class="sidebar">
+      <div class="sb-head">
+        <span>Post-its</span>
+        <span id="pool-count" style="font-size:10px;color:var(--text2)"></span>
+      </div>
+      <div class="sb-filters">
+        <button class="flt on"  data-f="all"    onclick="setFilter('all',this)">Tots</button>
+        <button class="flt"     data-f="blue"   onclick="setFilter('blue',this)">Licitadora</button>
+        <button class="flt"     data-f="teal"   onclick="setFilter('teal',this)">Secretaria</button>
+        <button class="flt"     data-f="purple" onclick="setFilter('purple',this)">Mesa</button>
+        <button class="flt"     data-f="gray"   onclick="setFilter('gray',this)">Intervenció</button>
+        <button class="flt"     data-f="sys"    onclick="setFilter('sys',this)">Sistemes</button>
+      </div>
+      <div class="pool" id="pool"></div>
+    </div>
+    <div class="canvas-wrap" id="canvas">
+      <div class="canvas-content" id="canvas-content">
+        <svg id="svg-layer" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+              <path d="M0,0 L0,6 L9,3 z" fill="#0f7a5a"/>
+            </marker>
+          </defs>
+          <line id="temp-line" x1="0" y1="0" x2="0" y2="0" style="display:none"/>
+        </svg>
+      </div>
+      <div class="toolbar">
+        <span class="tool-hint" id="tool-hint">Arrossega post-its · ESPAI per navegar · Roda per zoom · «Connectar» per línies</span>
+        <button class="btn" onclick="resetView()" style="margin-left:8px;padding:3px 9px;font-size:10px">⊙</button>
+        <span id="zoom-label" style="font-size:9px;font-family:var(--mono);color:var(--text3)">100%</span>
+      </div>
+      <div class="fab-group">
+        <div class="fab-item">
+          <button class="fab-btn fab-pain" onclick="openCustomModal()" title="Crear punt de dolor">+</button>
+          <span class="fab-label">Afegeix punt de dolor</span>
+        </div>
+        <div class="fab-item">
+          <button class="fab-btn fab-doc" onclick="openDocModal()" title="Crear document">+</button>
+          <span class="fab-label">Afegeix document</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TIPUS PANEL ══ -->
+<div class="panel" id="panel-tipus">
+  <div class="flux-layout">
+    <div class="canvas-wrap" id="canvas-tipus">
+      <div class="canvas-content" id="canvas-content-tipus">
+        <div class="swimlanes-bg">
+          <div class="lane-bg"><span class="lane-title" style="color:var(--blue)">Empresa licitadora</span></div>
+          <div class="lane-bg"><span class="lane-title" style="color:var(--teal)">Secretaria · Contractació</span></div>
+          <div class="lane-bg"><span class="lane-title" style="color:var(--purple)">Mesa de contractació</span></div>
+          <div class="lane-bg"><span class="lane-title" style="color:var(--gray)">Intervenció · Tresoreria</span></div>
+          <div class="lane-bg"><span class="lane-title" style="color:var(--text2)">Sistemes · Tecnologies</span></div>
+        </div>
+        <svg id="svg-layer-tipus" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="arrow-tipus" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+              <path d="M0,0 L0,6 L9,3 z" fill="#0f7a5a"/>
+            </marker>
+          </defs>
+        </svg>
+      </div>
+      <div class="toolbar">
+        <span class="tool-hint">Procediment Obert Simplificat LCSP (Art. 159) · ESPAI per navegar · Roda per zoom</span>
+        <button class="btn" onclick="resetTipusView()" style="margin-left:8px;padding:3px 9px;font-size:10px">⊙</button>
+        <span id="zoom-label-tipus" style="font-size:9px;font-family:var(--mono);color:var(--text3)">100%</span>
+      </div>
+      <div class="fab-group">
+        <div class="fab-item">
+          <button class="fab-btn fab-pain" onclick="openCustomModal()" title="Crear punt de dolor">+</button>
+          <span class="fab-label">Afegeix punt de dolor</span>
+        </div>
+        <div class="fab-item">
+          <button class="fab-btn fab-doc" onclick="openDocModal()" title="Crear document">+</button>
+          <span class="fab-label">Afegeix document</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ FITXES PANEL ══ -->
+<div class="panel" id="panel-fitxa">
+  <div class="fitxa-layout">
+    <div class="fitxa-sidebar">
+      <div class="fsb-head">
+        <span>Fitxes</span>
+        <button class="btn btn-teal" onclick="novaFitxa()" style="padding:3px 9px;font-size:10px">+ Nova</button>
+      </div>
+      <div class="fitxa-list" id="fitxa-list">
+        <div style="padding:20px 10px;font-size:11px;color:var(--text3);text-align:center;line-height:1.6">Cap fitxa.<br>Fes clic a «+ Nova».</div>
+      </div>
+      <div class="fsb-footer" id="fsb-count"></div>
+    </div>
+    <div class="fitxa-editor" id="fitxa-editor">
+      <div class="empty-state">
+        <div class="empty-icon">⚠</div>
+        <strong style="font-size:14px;color:var(--text2)">Cap fitxa seleccionada</strong>
+        <p>Crea una fitxa per cada punt de dolor identificat durant el taller.</p>
+        <button class="btn btn-teal" onclick="novaFitxa()" style="margin-top:8px">+ Nova fitxa</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: custom post-it ══ -->
+<div class="modal-back" id="custom-modal">
+  <div class="modal">
+    <h3>Nou post-it personalitzat</h3>
+    <p>Afegeix una tasca o document propi del teu rol.</p>
+    <label class="mlabel">Títol</label>
+    <input id="ci-title" type="text" placeholder="Ex: Revisar els criteris de solvència...">
+    <label class="mlabel" style="margin-top:10px">Descripció (opcional)</label>
+    <input id="ci-sub" type="text" placeholder="Ex: Verificació amb la llei 9/2017...">
+    <label class="mlabel" style="margin-top:10px">Qui ho fa</label>
+    <div class="lane-opts" id="lane-opts">
+      <div class="lane-opt" data-lane="blue"   onclick="selectLane('blue',this)">Empresa licitadora</div>
+      <div class="lane-opt sel-teal" data-lane="teal" onclick="selectLane('teal',this)">Secretaria · Contractació</div>
+      <div class="lane-opt" data-lane="purple" onclick="selectLane('purple',this)">Mesa de contractació</div>
+      <div class="lane-opt" data-lane="gray"   onclick="selectLane('gray',this)">Intervenció · Tresoreria</div>
+      <div class="lane-opt" data-lane="sys"    onclick="selectLane('sys',this)">Sistemes · Tecnologies</div>
+    </div>
+    <label class="pain-toggle">
+      <input type="checkbox" id="ci-pain">
+      <span>Marcar com a punt de dolor !</span>
+    </label>
+    <div style="display:flex;gap:7px;justify-content:flex-end">
+      <button class="btn" onclick="closeCustomModal()">Cancel·lar</button>
+      <button class="btn btn-teal" onclick="saveCustomPostit()">Afegir al canvas</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: custom document ══ -->
+<div class="modal-back" id="doc-modal">
+  <div class="modal">
+    <h3>Nou document</h3>
+    <p>Afegeix un nou document de treball per al teu rol.</p>
+    
+    <label class="mlabel">Títol del document</label>
+    <input id="cd-title" type="text" placeholder="Ex: Plec de prescripcions tècniques...">
+    
+    <label class="mlabel" style="margin-top:10px">Descripció (opcional)</label>
+    <input id="cd-sub" type="text" placeholder="Ex: Detall de requisits i criteris...">
+
+    <label class="mlabel" style="margin-top:10px">Tipus de document</label>
+    <div class="doc-type-opts">
+      <div class="doc-type-opt sel-word" data-type="word" onclick="selectDocType('word',this)">
+        <span style="font-size:18px">📄</span> Word
+      </div>
+      <div class="doc-type-opt" data-type="excel" onclick="selectDocType('excel',this)">
+        <span style="font-size:18px">📊</span> Excel
+      </div>
+      <div class="doc-type-opt" data-type="db" onclick="selectDocType('db',this)">
+        <span style="font-size:18px">🗄️</span> Base de dades
+      </div>
+    </div>
+
+    <label class="mlabel" style="margin-top:10px">Qui ho fa</label>
+    <div class="lane-opts" id="doc-lane-opts">
+      <div class="lane-opt" data-lane="blue"   onclick="selectDocLane('blue',this)">Empresa licitadora</div>
+      <div class="lane-opt sel-teal" data-lane="teal" onclick="selectDocLane('teal',this)">Secretaria · Contractació</div>
+      <div class="lane-opt" data-lane="purple" onclick="selectDocLane('purple',this)">Mesa de contractació</div>
+      <div class="lane-opt" data-lane="gray"   onclick="selectDocLane('gray',this)">Intervenció · Tresoreria</div>
+      <div class="lane-opt" data-lane="sys"    onclick="selectDocLane('sys',this)">Sistemes · Tecnologies</div>
+    </div>
+
+    <label class="pain-toggle">
+      <input type="checkbox" id="cd-pain">
+      <span>Marcar com a punt de dolor !</span>
+    </label>
+
+    <div style="display:flex;gap:7px;justify-content:flex-end">
+      <button class="btn" onclick="closeDocModal()">Cancel·lar</button>
+      <button class="btn btn-teal" onclick="saveCustomDoc()">Afegir al canvas</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   TAB SWITCHING
+═══════════════════════════════════════════════════════════ */
+let currentTab = 'flux';
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + tab).classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+
+  // show/hide flux-only controls in navbar
+  const fluxBtns = ['connect-btn', 'clear-conns-btn', 'clear-all-btn'];
+  fluxBtns.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = tab === 'flux' ? '' : 'none';
+  });
+}
+
+function printCurrent() { window.print(); }
+
+/* ═══════════════════════════════════════════════════════════
+   THEME
+═══════════════════════════════════════════════════════════ */
+let isDark = false;
+function toggleTheme() {
+  isDark = !isDark;
+  document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  document.getElementById('theme-btn').textContent = isDark ? '☀' : '☾';
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FLUX — DATA
+═══════════════════════════════════════════════════════════ */
+const POSTITS = [
+  {id:'b1',lane:'blue',  title:'Rep l\'anunci',               sub:'Perfil del contractant',               pain:false},
+  {id:'b2',lane:'blue',  title:'Comprova inscripció',         sub:'RELIC / ROLECE / CA',                  pain:false},
+  {id:'b3',lane:'blue',  title:'Prepara l\'oferta',           sub:'Declaració responsable (sense DEUC)',   pain:false},
+  {id:'b4',lane:'blue',  title:'Presenta l\'oferta',          sub:'1 o 2 sobres/arxius electrònics',      pain:false},
+  {id:'b5',lane:'blue',  title:'Rep requeriment garantia',    sub:'7 dies hàbils per respondre',          pain:false},
+  {id:'b6',lane:'blue',  title:'Presenta garantia definitiva',sub:'+ documentació de solvència',          pain:false},
+  {id:'b7',lane:'blue',  title:'Rep notificació adjudicació', sub:'≤ 5 dies naturals',                    pain:false},
+  {id:'b8',lane:'blue',  title:'Signa el contracte',          sub:'Firma electrònica',                    pain:false},
+  {id:'t1',lane:'teal',  title:'Detecta la necessitat',       sub:'Coordinació informal entre àrees',     pain:true },
+  {id:'t2',lane:'teal',  title:'Redacta els plecs',           sub:'PCAP + PPT + model d\'oferta',         pain:true },
+  {id:'t3',lane:'teal',  title:'Publica l\'anunci',           sub:'Perfil del contractant (no DOGC)',      pain:true },
+  {id:'t4',lane:'teal',  title:'Posa doc. a disposició',      sub:'Electrònicament des del dia publi.',    pain:true },
+  {id:'t5',lane:'teal',  title:'Rep i registra proposicions', sub:'Registre indicat a l\'anunci',         pain:true },
+  {id:'t6',lane:'teal',  title:'Gestiona consultes',          sub:'Aclariments als licitadors',           pain:false},
+  {id:'t7',lane:'teal',  title:'Convoca la mesa',             sub:'Acte d\'obertura de sobres',           pain:false},
+  {id:'t8',lane:'teal',  title:'Redacta l\'acta valoració',   sub:'Judici de valor + fórmules',           pain:true },
+  {id:'t9',lane:'teal',  title:'Notifica el requeriment',     sub:'Garantia + solvència (electrònic)',    pain:true },
+  {id:'t10',lane:'teal', title:'Notifica l\'adjudicació',     sub:'Mitjans electrònics',                  pain:false},
+  {id:'t11',lane:'teal', title:'Formalitza el contracte',     sub:'≤ 5 dies naturals',                    pain:true },
+  {id:'p1',lane:'purple',title:'Obre sobre judici de valor',  sub:'Personal tècnic — ≤ 7 dies',           pain:false},
+  {id:'p2',lane:'purple',title:'Llegeix valoració JV',        sub:'Inici acte obertura 2n sobre',         pain:false},
+  {id:'p3',lane:'purple',title:'Obre sobre per fórmules',     sub:'En sessió pública',                    pain:false},
+  {id:'p4',lane:'purple',title:'Avalua i classifica ofertes', sub:'En la mateixa sessió',                 pain:false},
+  {id:'p5',lane:'purple',title:'Fa la proposta adjudicació',  sub:'En la mateixa sessió',                 pain:false},
+  {id:'p6',lane:'purple',title:'Comprova aptitud al registre',sub:'RELIC / ROLECE — manual',              pain:true },
+  {id:'p7',lane:'purple',title:'Requereix garantia definitiva',sub:'7 dies hàbils — electrònic',          pain:false},
+  {id:'g1',lane:'gray',  title:'Verifica disponibilitat pressupostària',sub:'Reserva crèdit — SICAL',     pain:false},
+  {id:'g2',lane:'gray',  title:'Fiscalitza expedient i plecs',sub:'Prèviament a la publicació',           pain:true },
+  {id:'g3',lane:'gray',  title:'Fiscalitza proposta adjudicació',sub:'Fiscalització prèvia',              pain:true },
+  {id:'g4',lane:'gray',  title:'Fiscalitza el contracte',     sub:'Intervenció prèvia o posterior',       pain:false},
+  {id:'s1',lane:'sys',   title:'Gestor documental',           sub:'Plantilles no integrades amb ERP',     pain:true },
+  {id:'s2',lane:'sys',   title:'ERP / SICAL',                 sub:'Gestió pressupostària',                pain:false},
+  {id:'s3',lane:'sys',   title:'Perfil del contractant',      sub:'Publicació manual de l\'anunci',       pain:true },
+  {id:'s4',lane:'sys',   title:'PSCP / e-Licita',             sub:'Doc. disponible electrònicament',      pain:false},
+  {id:'s5',lane:'sys',   title:'Bústia electrònica',          sub:'Recepció ofertes xifrades',            pain:false},
+  {id:'s6',lane:'sys',   title:'Obertura sobres digitals',    sub:'Desxifrat en acte públic',             pain:false},
+  {id:'s7',lane:'sys',   title:'Excel ad hoc',                sub:'Càlcul puntuacions sense traçabilitat',pain:true },
+  {id:'s8',lane:'sys',   title:'Consulta RELIC / ROLECE',     sub:'Manual, sense integració automàtica',  pain:true },
+  {id:'s9',lane:'sys',   title:'Notificació electrònica',     sub:'Requeriment de garantia',              pain:false},
+  {id:'s10',lane:'sys',  title:'Portafirmes / signatura el.', sub:'Formalització del contracte',          pain:false},
+];
+
+const LANE_CSS = {blue:'p-blue',teal:'p-teal',purple:'p-purple',gray:'p-gray',sys:'p-gray'};
+
+let nodes={}, conns=[], filter='all', connMode=false, connFrom=null;
+let panX=0, panY=0, zoom=1, panMode=false;
+let customCounter=0, selectedLane='teal';
+
+const canvas       = document.getElementById('canvas');
+const canvasContent= document.getElementById('canvas-content');
+const svgEl        = document.getElementById('svg-layer');
+const tempLine     = document.getElementById('temp-line');
+
+function applyTransform(){
+  canvasContent.style.transform=`translate(${panX}px,${panY}px) scale(${zoom})`;
+  const l=document.getElementById('zoom-label');
+  if(l) l.textContent=Math.round(zoom*100)+'%';
+}
+function resetView(){ panX=0;panY=0;zoom=1;applyTransform(); }
+
+/* pool */
+function renderPool(){
+  const pool=document.getElementById('pool');
+  pool.innerHTML='';
+  let shown=0;
+  POSTITS.forEach(p=>{
+    const css=LANE_CSS[p.lane]||'p-gray';
+    const div=document.createElement('div');
+    div.className='pool-item '+css+(nodes[p.id]?' used':'');
+    div.dataset.id=p.id;
+    div.draggable=true;
+    div.innerHTML=`${p.pain?'<div class="pain-dot">!</div>':''}<div class="pt">${esc(p.title)}</div><div class="ps">${esc(p.sub)}</div>`;
+    if(filter==='all'||p.lane===filter){
+      shown++;
+      div.addEventListener('dragstart',e=>{
+        if(nodes[p.id]){e.preventDefault();return;}
+        e.dataTransfer.setData('postit-id',p.id);
+        e.dataTransfer.effectAllowed='copy';
+      });
+      pool.appendChild(div);
+    }
+  });
+  document.getElementById('pool-count').textContent=shown+'/'+POSTITS.length;
+}
+function setFilter(f,el){
+  filter=f;
+  document.querySelectorAll('.flt').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  renderPool();
+}
+
+/* drop on canvas */
+canvas.addEventListener('dragover',e=>{e.preventDefault();e.dataTransfer.dropEffect='copy';});
+canvas.addEventListener('drop',e=>{
+  e.preventDefault();
+  const id=e.dataTransfer.getData('postit-id');
+  if(!id) return;
+  const p=POSTITS.find(x=>x.id===id);
+  if(!p||nodes[id]) return;
+  const rect=canvas.getBoundingClientRect();
+  addNode(p,(e.clientX-rect.left-panX)/zoom-70,(e.clientY-rect.top-panY)/zoom-30);
+});
+
+/* add node */
+function addNode(p,x,y){
+  const css=LANE_CSS[p.lane]||'p-gray';
+  const el=document.createElement('div');
+  el.className='node '+css;
+  el.id='node-'+p.id;
+  el.style.left=x+'px'; el.style.top=y+'px';
+  el.draggable=false;
+  
+  const docBadge = p.docType ? (
+    p.docType === 'word' ? '<span class="doc-badge doc-badge-word">📄 Word</span>' :
+    p.docType === 'excel' ? '<span class="doc-badge doc-badge-excel">📊 Excel</span>' :
+    '<span class="doc-badge doc-badge-db">🗄️ Base de dades</span>'
+  ) : '';
+
+  el.innerHTML=`${p.pain?'<div class="nd">!</div>':''}${docBadge}<div class="nt">${esc(p.title)}</div><div class="ns">${esc(p.sub)}</div><button class="del">×</button><div class="port" data-side="right"></div><div class="port" data-side="left"></div><div class="port" data-side="top"></div><div class="port" data-side="bottom"></div>`;
+  canvasContent.appendChild(el);
+  nodes[p.id]={id:p.id,x,y,el};
+
+  el.querySelector('.del').addEventListener('mousedown',e=>e.stopPropagation());
+  el.querySelector('.del').addEventListener('click',e=>{e.stopPropagation();removeNode(p.id);});
+
+  el.querySelectorAll('.port').forEach(portEl=>{
+    portEl.addEventListener('mousedown',e=>{
+      e.stopPropagation();e.preventDefault();
+      if(!connMode) return;
+      const side=portEl.dataset.side;
+      connFrom={id:p.id,side};
+      const pos=nodeEdge(p.id,side);
+      tempLine.setAttribute('x1',pos.x);tempLine.setAttribute('y1',pos.y);
+      tempLine.setAttribute('x2',pos.x);tempLine.setAttribute('y2',pos.y);
+      tempLine.style.display='block';
+      setHint('Mou el ratolí i fes clic sobre un altre post-it');
+    });
+  });
+
+  el.addEventListener('mousedown',e=>{
+    if(e.target.classList.contains('del')) return;
+    if(e.target.classList.contains('port')){
+      if(connMode&&connFrom&&connFrom.id!==p.id){
+        addConnection(connFrom.id,connFrom.side,p.id,e.target.dataset.side);
+        connFrom=null;tempLine.style.display='none';
+        setHint('Fes clic al port ● per iniciar una nova connexió');
+      }
+      return;
+    }
+    if(panMode||e.button!==0) return;
+    if(connMode&&connFrom&&connFrom.id!==p.id){
+      const sp=nodeEdge(connFrom.id,connFrom.side);
+      addConnection(connFrom.id,connFrom.side,p.id,closestSide(p.id,sp));
+      connFrom=null;tempLine.style.display='none';
+      setHint('Fes clic al port ● per iniciar una nova connexió');
+      e.preventDefault();return;
+    }
+    if(connMode) return;
+    const sx=e.clientX,sy=e.clientY,snx=nodes[p.id].x,sny=nodes[p.id].y;
+    el.classList.add('dragging-node');
+    document.body.classList.add('dragging-active');
+    e.preventDefault();e.stopPropagation();
+    function onMove(ev){
+      ev.preventDefault();
+      nodes[p.id].x=snx+(ev.clientX-sx)/zoom;
+      nodes[p.id].y=sny+(ev.clientY-sy)/zoom;
+      el.style.left=nodes[p.id].x+'px';el.style.top=nodes[p.id].y+'px';
+      updateConnections();
+    }
+    function onUp(){
+      el.classList.remove('dragging-node');
+      document.body.classList.remove('dragging-active');
+      document.removeEventListener('mousemove',onMove);
+      document.removeEventListener('mouseup',onUp);
+    }
+    document.addEventListener('mousemove',onMove);
+    document.addEventListener('mouseup',onUp);
+  });
+  renderPool();
+}
+
+function closestSide(nodeId,from){
+  let best='left',bestD=Infinity;
+  ['right','left','top','bottom'].forEach(s=>{
+    const p=nodeEdge(nodeId,s);if(!p) return;
+    const d=(p.x-from.x)**2+(p.y-from.y)**2;
+    if(d<bestD){bestD=d;best=s;}
+  });
+  return best;
+}
+function removeNode(id){
+  const n=nodes[id];if(!n) return;
+  n.el.remove();delete nodes[id];
+  conns=conns.filter(c=>{if(c.from===id||c.to===id){c.el.remove();return false;}return true;});
+  renderPool();
+}
+
+function addConnection(fromId,fromSide,toId,toSide){
+  if(conns.find(c=>c.from===fromId&&c.to===toId&&c.fromSide===fromSide&&c.toSide===toSide)) return;
+  const col=isDark?'#34d4a0':'#0f7a5a';
+  const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+  path.setAttribute('fill','none');path.setAttribute('stroke',col);
+  path.setAttribute('stroke-width','2');path.setAttribute('marker-end','url(#arrow)');path.setAttribute('opacity','.7');
+  svgEl.appendChild(path);
+  conns.push({from:fromId,to:toId,fromSide,toSide,el:path});
+  updateConnections();
+}
+function updateConnections(){
+  conns.forEach(c=>{
+    const a=nodeEdge(c.from,c.fromSide),b=nodeEdge(c.to,c.toSide);
+    if(!a||!b) return;
+    const dist=Math.max(40,Math.hypot(b.x-a.x,b.y-a.y)*.4);
+    const ad=sideDir(c.fromSide),bd=sideDir(c.toSide);
+    c.el.setAttribute('d',`M ${a.x} ${a.y} C ${a.x+ad.dx*dist} ${a.y+ad.dy*dist}, ${b.x+bd.dx*dist} ${b.y+bd.dy*dist}, ${b.x} ${b.y}`);
+  });
+}
+function sideDir(s){return s==='right'?{dx:1,dy:0}:s==='left'?{dx:-1,dy:0}:s==='top'?{dx:0,dy:-1}:{dx:0,dy:1};}
+function nodeEdge(id,side){
+  const n=nodes[id];if(!n) return null;
+  const w=n.el.offsetWidth||140,h=n.el.offsetHeight||60;
+  if(side==='right') return{x:n.x+w+2,y:n.y+h/2};
+  if(side==='left')  return{x:n.x-2,y:n.y+h/2};
+  if(side==='top')   return{x:n.x+w/2,y:n.y-2};
+  return{x:n.x+w/2,y:n.y+h+2};
+}
+function nodeCenter(id){return nodeEdge(id,'right');}
+
+/* temp line + pan */
+canvas.addEventListener('mousemove',e=>{
+  if(!connFrom) return;
+  const r=canvas.getBoundingClientRect();
+  tempLine.setAttribute('x2',(e.clientX-r.left-panX)/zoom);
+  tempLine.setAttribute('y2',(e.clientY-r.top-panY)/zoom);
+});
+canvas.addEventListener('click',e=>{
+  if(connFrom&&(e.target===canvas||e.target===canvasContent||e.target===svgEl)){
+    connFrom=null;tempLine.style.display='none';
+    setHint('Fes clic al port ● per iniciar una connexió');
+  }
+});
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA') return;
+  if(e.code==='Space'&&!panMode){e.preventDefault();panMode=true;document.body.classList.add('pan-mode');setHint('Navegació — arrossega per moure · Deixa anar ESPAI per sortir');}
+});
+document.addEventListener('keyup',e=>{
+  if(e.code==='Space'&&panMode){panMode=false;document.body.classList.remove('pan-mode','panning');setHint('Arrossega post-its · ESPAI per navegar · Roda per zoom · «Connectar» per línies');}
+});
+canvas.addEventListener('mousedown',e=>{
+  if(!panMode||e.button!==0) return;
+  e.preventDefault();document.body.classList.add('panning');
+  const sx=e.clientX,sy=e.clientY,spx=panX,spy=panY;
+  function onMove(ev){panX=spx+(ev.clientX-sx);panY=spy+(ev.clientY-sy);applyTransform();}
+  function onUp(){document.body.classList.remove('panning');document.removeEventListener('mousemove',onMove);document.removeEventListener('mouseup',onUp);}
+  document.addEventListener('mousemove',onMove);document.addEventListener('mouseup',onUp);
+});
+canvas.addEventListener('wheel',e=>{
+  e.preventDefault();
+  const r=canvas.getBoundingClientRect();
+  const mx=e.clientX-r.left,my=e.clientY-r.top;
+  const wx=(mx-panX)/zoom,wy=(my-panY)/zoom;
+  const f=e.deltaY<0?1.1:1/1.1;
+  zoom=Math.min(2.5,Math.max(0.3,zoom*f));
+  panX=mx-wx*zoom;panY=my-wy*zoom;
+  applyTransform();
+},{passive:false});
+
+function toggleConnectMode(){
+  connMode=!connMode;
+  document.body.classList.toggle('connect-mode',connMode);
+  const btn=document.getElementById('connect-btn');
+  btn.textContent=connMode?'⟶ Connectant…':'⟶ Connectar';
+  btn.style.background=connMode?'var(--pur-bg)':'';
+  btn.style.borderColor=connMode?'var(--pur-bd)':'';
+  btn.style.color=connMode?'var(--purple)':'';
+  if(!connMode){connFrom=null;tempLine.style.display='none';setHint('Arrossega post-its · ESPAI per navegar · Roda per zoom · «Connectar» per línies');}
+  else setHint('Fes clic al port ● per iniciar una connexió');
+}
+function clearLines(){conns.forEach(c=>c.el.remove());conns=[];}
+function clearAll(){
+  if(!confirm('Esborrar tot el canvas?')) return;
+  clearLines();Object.values(nodes).forEach(n=>n.el.remove());nodes={};
+  connFrom=null;tempLine.style.display='none';renderPool();
+}
+function setHint(t){document.getElementById('tool-hint').textContent=t;}
+
+/* custom postit modal */
+function openCustomModal(){
+  document.getElementById('ci-title').value='';
+  document.getElementById('ci-sub').value='';
+  document.getElementById('ci-pain').checked=false;
+  selectedLane='teal';
+  document.querySelectorAll('.lane-opt').forEach(el=>el.className='lane-opt'+(el.dataset.lane==='teal'?' sel-teal':''));
+  document.getElementById('custom-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('ci-title').focus(),80);
+}
+function closeCustomModal(){document.getElementById('custom-modal').classList.remove('open');}
+function selectLane(lane,el){
+  selectedLane=lane;
+  document.querySelectorAll('.lane-opt').forEach(o=>o.className='lane-opt');
+  el.classList.add('sel-'+lane);
+}
+function saveCustomPostit(){
+  const title=document.getElementById('ci-title').value.trim();
+  if(!title){document.getElementById('ci-title').focus();return;}
+  const sub=document.getElementById('ci-sub').value.trim();
+  const pain=document.getElementById('ci-pain').checked;
+  customCounter++;
+  const id='custom-'+customCounter;
+  const p={id,lane:selectedLane,title,sub,pain,custom:true};
+  POSTITS.push(p);
+  
+  if (currentTab === 'tipus') {
+    const r = canvasTipus.getBoundingClientRect();
+    addTipusNode(p, (r.width/2 - tipusPanX)/tipusZoom - 70, (r.height/2 - tipusPanY)/tipusZoom - 30);
+  } else {
+    const r = canvas.getBoundingClientRect();
+    addNode(p, (r.width/2 - panX)/zoom - 70, (r.height/2 - panY)/zoom - 30);
+  }
+  closeCustomModal();renderPool();
+}
+document.getElementById('custom-modal').addEventListener('click',e=>{if(e.target.id==='custom-modal') closeCustomModal();});
+document.getElementById('ci-title').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();document.getElementById('ci-sub').focus();}if(e.key==='Escape') closeCustomModal();});
+document.getElementById('ci-sub').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();saveCustomPostit();}if(e.key==='Escape') closeCustomModal();});
+
+/* custom document modal */
+let selectedDocType = 'word';
+let selectedDocLane = 'teal';
+
+function openDocModal(){
+  document.getElementById('cd-title').value='';
+  document.getElementById('cd-sub').value='';
+  document.getElementById('cd-pain').checked=false;
+  selectedDocType='word';
+  selectedDocLane='teal';
+  
+  // reset type selection UI
+  document.querySelectorAll('#doc-modal .doc-type-opt').forEach(el=> {
+    el.className = 'doc-type-opt' + (el.dataset.type === 'word' ? ' sel-word' : '');
+  });
+  
+  // reset lane selection UI
+  document.querySelectorAll('#doc-lane-opts .lane-opt').forEach(el=> {
+    el.className = 'lane-opt' + (el.dataset.lane === 'teal' ? ' sel-teal' : '');
+  });
+  
+  document.getElementById('doc-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('cd-title').focus(),80);
+}
+function closeDocModal(){document.getElementById('doc-modal').classList.remove('open');}
+
+function selectDocType(type,el){
+  selectedDocType=type;
+  document.querySelectorAll('#doc-modal .doc-type-opt').forEach(o=>o.className='doc-type-opt');
+  el.classList.add('sel-'+type);
+}
+function selectDocLane(lane,el){
+  selectedDocLane=lane;
+  document.querySelectorAll('#doc-lane-opts .lane-opt').forEach(o=>o.className='lane-opt');
+  el.classList.add('sel-'+lane);
+}
+function saveCustomDoc(){
+  const title=document.getElementById('cd-title').value.trim();
+  if(!title){document.getElementById('cd-title').focus();return;}
+  const sub=document.getElementById('cd-sub').value.trim();
+  const pain=document.getElementById('cd-pain').checked;
+  customCounter++;
+  const id='custom-doc-'+customCounter;
+  const p={id,lane:selectedDocLane,title,sub,pain,custom:true,docType:selectedDocType};
+  POSTITS.push(p);
+  
+  if (currentTab === 'tipus') {
+    const r = canvasTipus.getBoundingClientRect();
+    addTipusNode(p, (r.width/2 - tipusPanX)/tipusZoom - 70, (r.height/2 - tipusPanY)/tipusZoom - 30);
+  } else {
+    const r = canvas.getBoundingClientRect();
+    addNode(p, (r.width/2 - panX)/zoom - 70, (r.height/2 - panY)/zoom - 30);
+  }
+  closeDocModal();renderPool();
+}
+
+document.getElementById('doc-modal').addEventListener('click',e=>{if(e.target.id==='doc-modal') closeDocModal();});
+document.getElementById('cd-title').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();document.getElementById('cd-sub').focus();}if(e.key==='Escape') closeDocModal();});
+document.getElementById('cd-sub').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();saveCustomDoc();}if(e.key==='Escape') closeDocModal();});
+
+/* ═══════════════════════════════════════════════════════════
+   FITXES DE PUNT DE DOLOR
+═══════════════════════════════════════════════════════════ */
+const F_PHASES=['Detecció i preparació','Publicació i licitació','Presentació d\'ofertes','Obertura i valoració','Mesa i proposta','Adjudicació i garantia','Formalització'];
+const F_LANES={blue:'Empresa licitadora',teal:'Secretaria · Contractació',purple:'Mesa de contractació',gray:'Intervenció · Tresoreria',sys:'Sistemes · Tecnologies'};
+const TECH_LABELS={rpa:'RPA',aaa:'AAA',ia:'IA',eliminar:'Eliminar',humana:'Revisió humana'};
+
+let fitxes=[],activaId=null,fitxaCounter=1;
+
+function novaFitxa(){
+  const id=Date.now();
+  fitxes.push({id,num:fitxaCounter++,titol:'',carril:'',fase:'',descripcio:'',frequencia:'',unitat_freq:'per expedient',temps_min:'',causa:'',impacte:'',tecnologia:'',risc:'',notes:'',tipologia:''});
+  renderFitxaSidebar();
+  obrirFitxa(id);
+  document.getElementById('tab-fitxa').querySelector('.tb').textContent=fitxes.length;
+}
+
+function getTypoBadge(t) {
+  if (!t) return '';
+  const labels = {
+    dades_repetitives: 'Dades repetitives',
+    sempre_aixi: 'Això és sempre així',
+    dificultat_alta: 'Tasques dificultat alta',
+    queixa_ciutadania: 'Queixa ciutadania'
+  };
+  const colors = {
+    dades_repetitives: 'rgba(26,110,196,0.12); color:var(--blue); border:1px solid var(--blue-bd)',
+    sempre_aixi: 'rgba(184,112,0,0.12); color:var(--amber); border:1px solid var(--amb-bd)',
+    dificultat_alta: 'rgba(109,79,199,0.12); color:var(--purple); border:1px solid var(--pur-bd)',
+    queixa_ciutadania: 'rgba(214,50,50,0.12); color:var(--red); border:1px solid var(--red-bd)'
+  };
+  return `<span style="display:inline-block; font-size:8px; font-weight:700; padding:1px 5px; border-radius:3px; margin-top:3px; background:${colors[t]||'#ccc'}">${labels[t]}</span>`;
+}
+
+function renderFitxaSidebar(){
+  const list=document.getElementById('fitxa-list');
+  if(!fitxes.length){list.innerHTML='<div style="padding:20px 10px;font-size:11px;color:var(--text3);text-align:center;line-height:1.6">Cap fitxa.<br>Fes clic a «+ Nova».</div>';document.getElementById('fsb-count').textContent='';return;}
+  list.innerHTML=fitxes.map(f=>`<div class="fitxa-item${f.id===activaId?' active':''}" onclick="obrirFitxa(${f.id})"><span class="fi-num">FITXA #${String(f.num).padStart(2,'0')}</span><span class="fi-name">${esc(f.titol||'(sense títol)')}</span><span class="fi-lane">${esc(f.carril||'—')}</span>${getTypoBadge(f.tipologia)}</div>`).join('');
+  document.getElementById('fsb-count').textContent=fitxes.length+' fitxa'+(fitxes.length!==1?'es':'');
+  document.getElementById('tab-fitxa').querySelector('.tb').textContent=fitxes.length;
+}
+
+function obrirFitxa(id){
+  if(activaId) saveFitxaActive();
+  activaId=id;
+  renderFitxaSidebar();
+  renderFitxaEditor(fitxes.find(x=>x.id===id));
+}
+
+function renderFitxaEditor(f){
+  const ed=document.getElementById('fitxa-editor');
+  ed.innerHTML=`
+    <div class="form-header">
+      <div>
+        <div style="font-size:18px;font-weight:600;margin-bottom:4px"><span id="live-title">${esc(f.titol||'Nova fitxa')}</span></div>
+        <div style="font-size:11px;color:var(--text3)">${esc(f.carril||'Carril no assignat')} · ${esc(f.fase||'Fase no assignada')}</div>
+      </div>
+      <div style="display:flex;gap:6px;align-items:flex-start" class="form-actions">
+        <span class="form-id">FITXA #${String(f.num).padStart(2,'0')}</span>
+        <button class="btn btn-teal" onclick="window.print()">🖨 Imprimir</button>
+        <button class="btn btn-red" onclick="eliminarFitxa(${f.id})">Eliminar</button>
+      </div>
+    </div>
+    <hr class="divider">
+    <div class="row2">
+      <div class="field">
+        <label>Carril</label>
+        <select id="f-carril" onchange="fsync(${f.id},'carril',this.value)">
+          <option value="">— Selecciona —</option>
+          ${Object.entries(F_LANES).map(([k,v])=>`<option${f.carril===v?' selected':''}>${v}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field">
+        <label>Fase</label>
+        <select id="f-fase" onchange="fsync(${f.id},'fase',this.value)">
+          <option value="">— Selecciona —</option>
+          ${F_PHASES.map((p,i)=>`<option${f.fase===p?' selected':''}>${p}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label>Títol del punt de dolor</label>
+      <div class="field-hint">Descriu el problema en una frase curta i concreta.</div>
+      <input type="text" id="f-titol" value="${esc(f.titol)}" placeholder="Ex: Introducció manual de dades del plec en tres sistemes"
+        oninput="fsync(${f.id},'titol',this.value);document.getElementById('live-title').textContent=this.value||'Nova fitxa'">
+    </div>
+    <div class="field">
+      <label>Tipologia del punt de dolor</label>
+      <div class="field-hint">Selecciona la tipologia que millor descriu la naturalesa d'aquest obstacle.</div>
+      <div class="typology-group" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:5px;">
+        ${[['dades_repetitives','Dades repetitives'],['sempre_aixi',`'Això és sempre així'`],['dificultat_alta','Tasques de dificultat alta'],['queixa_ciutadania','Queixa ciutadania']]
+          .map(([val,lab])=>`<div class="typo-pill${f.tipologia===val?' sel-'+val:''}" onclick="selTypology(${f.id},'${val}',this)">${lab}</div>`).join('')}
+      </div>
+    </div>
+    <div class="field">
+      <label>Descripció detallada</label>
+      <div class="field-hint">Qui fa què, quan, i com.</div>
+      <textarea id="f-desc" placeholder="Ex: Cada vegada que s'obre un expedient..." oninput="fsync(${f.id},'descripcio',this.value)">${esc(f.descripcio)}</textarea>
+    </div>
+    <hr class="divider">
+    <div class="row3">
+      <div class="field"><label>Freqüència</label><input type="text" id="f-freq" value="${esc(f.frequencia)}" placeholder="Ex: 3–5" oninput="fsync(${f.id},'frequencia',this.value)"></div>
+      <div class="field"><label>Unitat</label><select id="f-ufreq" onchange="fsync(${f.id},'unitat_freq',this.value)">${['per expedient','per setmana','per mes','per any'].map(u=>`<option${f.unitat_freq===u?' selected':''}>${u}</option>`).join('')}</select></div>
+      <div class="field"><label>Temps perdut (min)</label><input type="text" id="f-temps" value="${esc(f.temps_min)}" placeholder="Ex: 45" oninput="fsync(${f.id},'temps_min',this.value)"></div>
+    </div>
+    <div class="field">
+      <label>Causa arrel</label>
+      <div class="field-hint">Per què passa? Busca la causa real, no el símptoma.</div>
+      <textarea id="f-causa" placeholder="Ex: Els sistemes no estan integrats..." oninput="fsync(${f.id},'causa',this.value)">${esc(f.causa)}</textarea>
+    </div>
+    <div class="field">
+      <label>Impacte si no es resol</label>
+      <textarea id="f-impacte" placeholder="Ex: Errors de transcripció, retard mig de 2 dies..." oninput="fsync(${f.id},'impacte',this.value)">${esc(f.impacte)}</textarea>
+    </div>
+    <hr class="divider">
+    <div class="field">
+      <label>Solució tecnològica candidata</label>
+      <div class="field-hint">Selecciona la millor opció. <strong>AAA</strong> = regles fixes sense IA · <strong>RPA</strong> = automatització de clics/formularis · <strong>IA</strong> = interpretació o aprenentatge</div>
+      <div class="tech-group">
+        ${[['aaa','📋 AAA','Actuació Administrativa Automatitzada — regles fixes'],['rpa','🤖 RPA','Tasca repetitiva basada en clics o formularis'],['ia','🧠 IA','Cal interpretar documents o prendre decisions'],['eliminar','✕ Eliminar','El pas no aporta valor, es pot suprimir'],['humana','👤 Revisió humana','Requereix criteri humà']]
+          .map(([val,lab,tip])=>`<div class="tech-pill${f.tecnologia===val?' sel-'+val:''}" title="${tip}" onclick="selTech(${f.id},'${val}',this)">${lab}</div>`).join('')}
+      </div>
+      <div id="tech-hint" style="font-size:11px;color:var(--text3);margin-top:7px">${techHint(f.tecnologia)}</div>
+    </div>
+    <div class="field">
+      <label>Nivell de risc (Reglament IA)</label>
+      <div class="field-hint">Impacte sobre drets fonamentals o decisions vinculants.</div>
+      <div class="risk-group">
+        ${[['baix','Baix'],['mitja','Mitjà'],['alt','Alt']].map(([val,lab])=>`<div class="risk-opt${f.risc===val?' sel-'+val:''}" onclick="selRisk(${f.id},'${val}',this)">${lab}</div>`).join('')}
+      </div>
+    </div>
+    <div class="field" style="margin-bottom:40px">
+      <label>Notes addicionals</label>
+      <textarea id="f-notes" placeholder="Restriccions tècniques, persones referents..." oninput="fsync(${f.id},'notes',this.value)">${esc(f.notes)}</textarea>
+    </div>`;
+}
+
+function techHint(t){
+  return({aaa:'AAA: automatització per regles fixes i predeterminades, sense aprenentatge.',rpa:'RPA: ideal per tasques repetitives basades en clics o formularis, sense variabilitat.',ia:'IA: quan cal llegir documents no estructurats, classificar o interpretar.',eliminar:'Eliminar: el pas no aporta valor i pot suprimir-se.',humana:'Revisió humana: el criteri administratiu és necessari i no es pot delegar.'})[t]||'';
+}
+function fsync(id,camp,valor){
+  const f=fitxes.find(x=>x.id===id);if(!f) return;
+  f[camp]=valor;
+  if(['titol','carril','fase'].includes(camp)) renderFitxaSidebar();
+}
+function selTech(id,val,el){
+  const f=fitxes.find(x=>x.id===id);if(!f) return;
+  f.tecnologia=val;
+  el.closest('.tech-group').querySelectorAll('.tech-pill').forEach(p=>p.className='tech-pill');
+  el.classList.add('sel-'+val);
+  document.getElementById('tech-hint').textContent=techHint(val);
+}
+function selRisk(id,val,el){
+  const f=fitxes.find(x=>x.id===id);if(!f) return;
+  f.risc=val;
+  el.closest('.risk-group').querySelectorAll('.risk-opt').forEach(r=>r.className='risk-opt');
+  el.classList.add('sel-'+val);
+}
+function selTypology(id,val,el){
+  const f=fitxes.find(x=>x.id===id);if(!f) return;
+  if(f.tipologia===val){
+    f.tipologia='';
+    el.classList.remove('sel-'+val);
+  } else {
+    f.tipologia=val;
+    el.closest('.typology-group').querySelectorAll('.typo-pill').forEach(p=>{
+      p.className='typo-pill';
+    });
+    el.classList.add('sel-'+val);
+  }
+  renderFitxaSidebar();
+}
+function saveFitxaActive(){
+  if(!activaId) return;
+  const f=fitxes.find(x=>x.id===activaId);if(!f) return;
+  [['f-titol','titol'],['f-desc','descripcio'],['f-freq','frequencia'],['f-temps','temps_min'],['f-causa','causa'],['f-impacte','impacte'],['f-notes','notes']].forEach(([elId,camp])=>{const el=document.getElementById(elId);if(el) f[camp]=el.value;});
+  [['f-carril','carril'],['f-fase','fase'],['f-ufreq','unitat_freq']].forEach(([elId,camp])=>{const el=document.getElementById(elId);if(el) f[camp]=el.value;});
+}
+function eliminarFitxa(id){
+  if(!confirm('Eliminar aquesta fitxa?')) return;
+  fitxes=fitxes.filter(f=>f.id!==id);
+  activaId=null;
+  renderFitxaSidebar();
+  document.getElementById('fitxa-editor').innerHTML=`<div class="empty-state"><div class="empty-icon">⚠</div><strong style="font-size:14px;color:var(--text2)">Cap fitxa seleccionada</strong><p>Crea una fitxa per cada punt de dolor identificat.</p><button class="btn btn-teal" onclick="novaFitxa()" style="margin-top:8px">+ Nova fitxa</button></div>`;
+}
+
+/* utils */
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+/* ═══════════════════════════════════════════════════════════
+   PROCEDIMENT TIPUS
+═══════════════════════════════════════════════════════════ */
+let tipusNodes = {}, tipusConns = [];
+let tipusPanX = 0, tipusPanY = 0, tipusZoom = 0.85;
+
+const canvasTipus        = document.getElementById('canvas-tipus');
+const canvasContentTipus = document.getElementById('canvas-content-tipus');
+const svgElTipus         = document.getElementById('svg-layer-tipus');
+
+const STANDARD_FLOW = [
+  't1', 'g1', 's2', 't2', 's1', 'g2',
+  't3', 's3', 't4', 's4',
+  'b1', 'b2', 'b3', 'b4', 's5', 't5', 't6', 't7',
+  'p1', 's6', 'p2', 'p3', 'p4', 's7', 't8', 'p5', 'g3', 'p6', 's8', 'p7', 't9', 's9',
+  'b5', 'b6', 't10', 'b7', 'g4', 't11', 'b8', 's10'
+];
+
+function applyTipusTransform(){
+  canvasContentTipus.style.transform=`translate(${tipusPanX}px,${tipusPanY}px) scale(${tipusZoom})`;
+  const l=document.getElementById('zoom-label-tipus');
+  if(l) l.textContent=Math.round(tipusZoom*100)+'%';
+}
+function resetTipusView(){
+  tipusPanX = 50;
+  tipusPanY = 40;
+  tipusZoom = 0.8;
+  applyTipusTransform();
+}
+
+function addTipusNode(p, x, y) {
+  const css = LANE_CSS[p.lane] || 'p-gray';
+  const el = document.createElement('div');
+  el.className = 'node ' + css;
+  el.id = 'tipus-node-' + p.id;
+  el.style.left = x + 'px'; el.style.top = y + 'px';
+  el.draggable = false;
+  
+  const docBadge = p.docType ? (
+    p.docType === 'word' ? '<span class="doc-badge doc-badge-word">📄 Word</span>' :
+    p.docType === 'excel' ? '<span class="doc-badge doc-badge-excel">📊 Excel</span>' :
+    '<span class="doc-badge doc-badge-db">🗄️ Base de dades</span>'
+  ) : '';
+
+  el.innerHTML = `${p.pain ? '<div class="nd">!</div>' : ''}${docBadge}<div class="nt">${esc(p.title)}</div><div class="ns">${esc(p.sub)}</div>`;
+  canvasContentTipus.appendChild(el);
+  tipusNodes[p.id] = { id: p.id, x, y, el };
+
+  el.addEventListener('mousedown', e => {
+    if (e.target.closest('.del')) return;
+    const sx = e.clientX, sy = e.clientY, snx = tipusNodes[p.id].x, sny = tipusNodes[p.id].y;
+    el.classList.add('dragging-node');
+    document.body.classList.add('dragging-active');
+    e.preventDefault(); e.stopPropagation();
+    function onMove(ev) {
+      ev.preventDefault();
+      tipusNodes[p.id].x = snx + (ev.clientX - sx) / tipusZoom;
+      tipusNodes[p.id].y = sny + (ev.clientY - sy) / tipusZoom;
+      el.style.left = tipusNodes[p.id].x + 'px'; el.style.top = tipusNodes[p.id].y + 'px';
+      updateTipusConnections();
+    }
+    function onUp() {
+      el.classList.remove('dragging-node');
+      document.body.classList.remove('dragging-active');
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+    }
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+  });
+}
+
+function addTipusConnection(fromId, toId) {
+  const col = isDark ? '#34d4a0' : '#0f7a5a';
+  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  path.setAttribute('fill', 'none'); path.setAttribute('stroke', col);
+  path.setAttribute('stroke-width', '2'); path.setAttribute('marker-end', 'url(#arrow-tipus)'); path.setAttribute('opacity', '.7');
+  svgElTipus.appendChild(path);
+  tipusConns.push({ from: fromId, to: toId, el: path });
+}
+
+function updateTipusConnections() {
+  tipusConns.forEach(c => {
+    const fromCenter = tipusNodeCenter(c.from);
+    const toCenter = tipusNodeCenter(c.to);
+    if (!fromCenter || !toCenter) return;
+    
+    let fromSide = 'right', toSide = 'left';
+    if (Math.abs(fromCenter.y - toCenter.y) > 100) {
+      if (fromCenter.y < toCenter.y) {
+        fromSide = 'bottom'; toSide = 'top';
+      } else {
+        fromSide = 'top'; toSide = 'bottom';
+      }
+    } else if (fromCenter.x > toCenter.x) {
+      fromSide = 'left'; toSide = 'right';
+    }
+    
+    const a = tipusNodeEdge(c.from, fromSide), b = tipusNodeEdge(c.to, toSide);
+    if (!a || !b) return;
+    const dist = Math.max(40, Math.hypot(b.x - a.x, b.y - a.y) * .4);
+    const ad = sideDir(fromSide), bd = sideDir(toSide);
+    c.el.setAttribute('d', `M ${a.x} ${a.y} C ${a.x + ad.dx * dist} ${a.y + ad.dy * dist}, ${b.x + bd.dx * dist} ${b.y + bd.dy * dist}, ${b.x} ${b.y}`);
+  });
+}
+
+function tipusNodeEdge(id, side) {
+  const n = tipusNodes[id]; if (!n) return null;
+  const w = n.el.offsetWidth || 140, h = n.el.offsetHeight || 60;
+  if (side === 'right') return { x: n.x + w + 2, y: n.y + h / 2 };
+  if (side === 'left')  return { x: n.x - 2, y: n.y + h / 2 };
+  if (side === 'top')   return { x: n.x + w / 2, y: n.y - 2 };
+  return { x: n.x + w / 2, y: n.y + h + 2 };
+}
+
+function tipusNodeCenter(id) {
+  const n = tipusNodes[id]; if (!n) return null;
+  const w = n.el.offsetWidth || 140, h = n.el.offsetHeight || 60;
+  return { x: n.x + w / 2, y: n.y + h / 2 };
+}
+
+function initProcedimentTipus() {
+  const laneOffsets = { blue: 0, teal: 140, purple: 280, gray: 420, sys: 560 };
+  tipusNodes = {};
+  tipusConns = [];
+  
+  STANDARD_FLOW.forEach((id, col) => {
+    const p = POSTITS.find(x => x.id === id);
+    if (!p) return;
+    const x = 60 + col * 180;
+    const y = laneOffsets[p.lane] + 35;
+    addTipusNode(p, x, y);
+  });
+  
+  for (let i = 0; i < STANDARD_FLOW.length - 1; i++) {
+    addTipusConnection(STANDARD_FLOW[i], STANDARD_FLOW[i+1]);
+  }
+  
+  setTimeout(() => {
+    updateTipusConnections();
+    resetTipusView();
+  }, 100);
+}
+
+// Navigation & zoom for typical procedure canvas
+canvasTipus.addEventListener('mousedown', e => {
+  if (e.button !== 0 || e.target.closest('.node')) return;
+  e.preventDefault();
+  canvasTipus.style.cursor = 'grabbing';
+  const sx = e.clientX, sy = e.clientY, spx = tipusPanX, spy = tipusPanY;
+  function onMove(ev) {
+    tipusPanX = spx + (ev.clientX - sx);
+    tipusPanY = spy + (ev.clientY - sy);
+    applyTipusTransform();
+  }
+  function onUp() {
+    canvasTipus.style.cursor = '';
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onUp);
+  }
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onUp);
+});
+
+canvasTipus.addEventListener('wheel', e => {
+  e.preventDefault();
+  const r = canvasTipus.getBoundingClientRect();
+  const mx = e.clientX - r.left, my = e.clientY - r.top;
+  const wx = (mx - tipusPanX) / tipusZoom, wy = (my - tipusPanY) / tipusZoom;
+  const f = e.deltaY < 0 ? 1.1 : 1 / 1.1;
+  tipusZoom = Math.min(2.5, Math.max(0.3, tipusZoom * f));
+  tipusPanX = mx - wx * tipusZoom;
+  tipusPanY = my - wy * tipusZoom;
+  applyTipusTransform();
+}, { passive: false });
+
+/* init */
+renderPool();
+initProcedimentTipus();
+</script>
+</body>
+</html>
