@@ -154,8 +154,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
 .node.dragging-node{cursor:grabbing;box-shadow:0 8px 24px rgba(0,0,0,.20);z-index:100;}
 .node .nt{font-weight:600;margin-bottom:1px;font-size:10px;pointer-events:none;}
 .node .ns{font-size:9px;opacity:.7;pointer-events:none;}
-.node .nd{position:absolute;top:-5px;right:-5px;width:13px;height:13px;background:var(--red);
-  border-radius:50%;font-size:7px;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;pointer-events:none;}
+.node .nd{position:absolute;top:-7px;right:-7px;width:17px;height:17px;background:var(--red);
+  border-radius:50%;font-size:10px;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;cursor:pointer;pointer-events:auto;transition:transform 0.1s;}
+.node .nd:hover{transform:scale(1.25);background:#b12222;}
 .node .del{position:absolute;top:3px;right:3px;background:none;border:none;cursor:pointer;
   font-size:12px;line-height:1;color:inherit;opacity:.2;padding:0 2px;transition:opacity .12s;font-family:var(--font);}
 .node .del:hover{opacity:.9;}
@@ -436,6 +437,149 @@ body.dragging-active{user-select:none;-webkit-user-select:none;cursor:grabbing!i
   opacity:0.35;
 }
 
+/* ═══════════════════════════════════════════
+   DOCUMENT-SHAPED POST-ITS (DOG-EAR FOLD)
+═══════════════════════════════════════════ */
+.node.node-doc {
+  border-top-right-radius: 0px !important;
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%);
+  position: absolute;
+}
+.node-doc-fold {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 14px;
+  height: 14px;
+  border-bottom-left-radius: 4px;
+  pointer-events: none;
+  z-index: 55;
+  box-shadow: -1px 1px 2px rgba(0,0,0,0.06);
+}
+
+/* WORD (Blue) Document */
+.node.node-doc-word {
+  background: #e8f1fa !important;
+  border-color: #a6cbef !important;
+  color: #1a6fc4 !important;
+}
+.node.node-doc-word .nt { color: #1a6fc4 !important; }
+.node.node-doc-word .ns { color: #5e5d59 !important; }
+.node.node-doc-word .node-doc-fold {
+  background: #ffffff !important;
+  border-left: 1.2px solid #a6cbef;
+  border-bottom: 1.2px solid #a6cbef;
+}
+[data-theme="dark"] .node.node-doc-word {
+  background: rgba(91,170,245,0.11) !important;
+  border-color: rgba(91,170,245,0.34) !important;
+  color: #5baaf5 !important;
+}
+[data-theme="dark"] .node.node-doc-word .nt { color: #5baaf5 !important; }
+[data-theme="dark"] .node.node-doc-word .ns { color: #9c9a94 !important; }
+[data-theme="dark"] .node.node-doc-word .node-doc-fold {
+  background: var(--surface) !important;
+  border-left: 1.2px solid rgba(91,170,245,0.34);
+  border-bottom: 1.2px solid rgba(91,170,245,0.34);
+}
+
+/* EXCEL (Green) Document */
+.node.node-doc-excel {
+  background: #e8f2eb !important;
+  border-color: #b4dec0 !important;
+  color: #1a7a3c !important;
+}
+.node.node-doc-excel .nt { color: #1a7a3c !important; }
+.node.node-doc-excel .ns { color: #5e5d59 !important; }
+.node.node-doc-excel .node-doc-fold {
+  background: #ffffff !important;
+  border-left: 1.2px solid #b4dec0;
+  border-bottom: 1.2px solid #b4dec0;
+}
+[data-theme="dark"] .node.node-doc-excel {
+  background: rgba(61,186,110,0.10) !important;
+  border-color: rgba(61,186,110,0.28) !important;
+  color: #3dba6e !important;
+}
+[data-theme="dark"] .node.node-doc-excel .nt { color: #3dba6e !important; }
+[data-theme="dark"] .node.node-doc-excel .ns { color: #9c9a94 !important; }
+[data-theme="dark"] .node.node-doc-excel .node-doc-fold {
+  background: var(--surface) !important;
+  border-left: 1.2px solid rgba(61,186,110,0.28);
+  border-bottom: 1.2px solid rgba(61,186,110,0.28);
+}
+
+/* DATABASE (Purple) Document */
+.node.node-doc-db {
+  background: #f0edfa !important;
+  border-color: #d2c8f0 !important;
+  color: #6d4fc7 !important;
+}
+.node.node-doc-db .nt { color: #6d4fc7 !important; }
+.node.node-doc-db .ns { color: #5e5d59 !important; }
+.node.node-doc-db .node-doc-fold {
+  background: #ffffff !important;
+  border-left: 1.2px solid #d2c8f0;
+  border-bottom: 1.2px solid #d2c8f0;
+}
+[data-theme="dark"] .node.node-doc-db {
+  background: rgba(176,156,248,0.11) !important;
+  border-color: rgba(176,156,248,0.30) !important;
+  color: #b09cf8 !important;
+}
+[data-theme="dark"] .node.node-doc-db .nt { color: #b09cf8 !important; }
+[data-theme="dark"] .node.node-doc-db .ns { color: #9c9a94 !important; }
+[data-theme="dark"] .node.node-doc-db .node-doc-fold {
+  background: var(--surface) !important;
+  border-left: 1.2px solid rgba(176,156,248,0.30);
+  border-bottom: 1.2px solid rgba(176,156,248,0.30);
+}
+
+/* Note: node-pain style removed by user request */
+
+.node.node-pain-node {
+  background: var(--red-bg) !important;
+  border-color: var(--red-bd) !important;
+  color: var(--red) !important;
+  width: 140px !important;
+  min-height: 60px !important;
+  border-radius: 6px !important;
+  padding: 8px 22px 8px 9px !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,.10) !important;
+  display: block !important;
+}
+.node.node-pain-node .nt {
+  color: var(--red) !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  margin-bottom: 1px !important;
+}
+.node.node-pain-node .ns {
+  font-size: 9px !important;
+  opacity: .7 !important;
+}
+.node.node-pain-node .del {
+  position: absolute !important;
+  top: 3px !important;
+  right: 3px !important;
+  background: none !important;
+  border: none !important;
+  cursor: pointer !important;
+  font-size: 12px !important;
+  line-height: 1 !important;
+  color: inherit !important;
+  opacity: .2 !important;
+  padding: 0 2px !important;
+  transition: opacity .12s !important;
+  font-family: var(--font) !important;
+}
+.node.node-pain-node .del:hover {
+  opacity: .9 !important;
+}
+.p-red {
+  display: none;
+}
+
 @media print{
   .topnav,.fab-group,.toolbar,.modal-back,.fsb-footer,.form-header .form-actions{display:none!important;}
   .panel{display:flex!important;height:auto!important;}
@@ -507,7 +651,7 @@ body.dragging-active{user-select:none;-webkit-user-select:none;cursor:grabbing!i
       </div>
       <div class="fab-group">
         <div class="fab-item">
-          <button class="fab-btn fab-pain" onclick="openCustomModal()" title="Crear punt de dolor">+</button>
+          <button class="fab-btn fab-pain" onclick="openPainModal()" title="Crear punt de dolor">+</button>
           <span class="fab-label">Afegeix punt de dolor</span>
         </div>
         <div class="fab-item">
@@ -546,7 +690,7 @@ body.dragging-active{user-select:none;-webkit-user-select:none;cursor:grabbing!i
       </div>
       <div class="fab-group">
         <div class="fab-item">
-          <button class="fab-btn fab-pain" onclick="openCustomModal()" title="Crear punt de dolor">+</button>
+          <button class="fab-btn fab-pain" onclick="openPainModal()" title="Crear punt de dolor">+</button>
           <span class="fab-label">Afegeix punt de dolor</span>
         </div>
         <div class="fab-item">
@@ -656,6 +800,31 @@ body.dragging-active{user-select:none;-webkit-user-select:none;cursor:grabbing!i
   </div>
 </div>
 
+<!-- ══ MODAL: custom pain point ══ -->
+<div class="modal-back" id="pain-modal">
+  <div class="modal">
+    <h3>Nou punt de dolor</h3>
+    <p>Crea un nou punt de dolor i afegeix-lo al canvas.</p>
+    
+    <label class="mlabel">Títol del punt de dolor</label>
+    <input id="cp-title" type="text" placeholder="Ex: Introducció manual de dades...">
+    
+    <label class="mlabel" style="margin-top:10px">Qui ho fa (opcional)</label>
+    <div class="lane-opts" id="pain-lane-opts">
+      <div class="lane-opt" data-lane="blue"   onclick="selectPainLane('blue',this)">Empresa licitadora</div>
+      <div class="lane-opt sel-teal" data-lane="teal" onclick="selectPainLane('teal',this)">Secretaria · Contractació</div>
+      <div class="lane-opt" data-lane="purple" onclick="selectPainLane('purple',this)">Mesa de contractació</div>
+      <div class="lane-opt" data-lane="gray"   onclick="selectPainLane('gray',this)">Intervenció · Tresoreria</div>
+      <div class="lane-opt" data-lane="sys"    onclick="selectPainLane('sys',this)">Sistemes · Tecnologies</div>
+    </div>
+
+    <div style="display:flex;gap:7px;justify-content:flex-end;margin-top:12px;">
+      <button class="btn" onclick="closePainModal()">Cancel·lar</button>
+      <button class="btn btn-red" onclick="saveCustomPain()">Afegir al canvas</button>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ═══════════════════════════════════════════════════════════
    TAB SWITCHING
@@ -734,7 +903,7 @@ const POSTITS = [
   {id:'s4',lane:'sys',   title:'PSCP / e-Licita',             sub:'Doc. disponible electrònicament',      pain:false},
   {id:'s5',lane:'sys',   title:'Bústia electrònica',          sub:'Recepció ofertes xifrades',            pain:false},
   {id:'s6',lane:'sys',   title:'Obertura sobres digitals',    sub:'Desxifrat en acte públic',             pain:false},
-  {id:'s7',lane:'sys',   title:'Excel ad hoc',                sub:'Càlcul puntuacions sense traçabilitat',pain:true },
+  {id:'s7',lane:'sys',   title:'Excel ad hoc',                sub:'Càlcul puntuacions sense traçabilitat',pain:true, docType:'excel' },
   {id:'s8',lane:'sys',   title:'Consulta RELIC / ROLECE',     sub:'Manual, sense integració automàtica',  pain:true },
   {id:'s9',lane:'sys',   title:'Notificació electrònica',     sub:'Requeriment de garantia',              pain:false},
   {id:'s10',lane:'sys',  title:'Portafirmes / signatura el.', sub:'Formalització del contracte',          pain:false},
@@ -805,7 +974,11 @@ canvas.addEventListener('drop',e=>{
 function addNode(p,x,y){
   const css=LANE_CSS[p.lane]||'p-gray';
   const el=document.createElement('div');
-  el.className='node '+css;
+  let nodeCss = css;
+  if (p.docType) {
+    nodeCss = 'node-doc node-doc-' + p.docType;
+  }
+  el.className='node '+nodeCss;
   el.id='node-'+p.id;
   el.style.left=x+'px'; el.style.top=y+'px';
   el.draggable=false;
@@ -816,7 +989,8 @@ function addNode(p,x,y){
     '<span class="doc-badge doc-badge-db">🗄️ Base de dades</span>'
   ) : '';
 
-  el.innerHTML=`${p.pain?'<div class="nd">!</div>':''}${docBadge}<div class="nt">${esc(p.title)}</div><div class="ns">${esc(p.sub)}</div><button class="del">×</button><div class="port" data-side="right"></div><div class="port" data-side="left"></div><div class="port" data-side="top"></div><div class="port" data-side="bottom"></div>`;
+  const foldHtml = p.docType ? '<div class="node-doc-fold"></div>' : '';
+  el.innerHTML=`${foldHtml}${docBadge}<div class="nt">${esc(p.title)}</div><div class="ns">${esc(p.sub)}</div><button class="del">×</button><div class="port" data-side="right"></div><div class="port" data-side="left"></div><div class="port" data-side="top"></div><div class="port" data-side="bottom"></div>`;
   canvasContent.appendChild(el);
   nodes[p.id]={id:p.id,x,y,el};
 
@@ -865,6 +1039,7 @@ function addNode(p,x,y){
       nodes[p.id].x=snx+(ev.clientX-sx)/zoom;
       nodes[p.id].y=sny+(ev.clientY-sy)/zoom;
       el.style.left=nodes[p.id].x+'px';el.style.top=nodes[p.id].y+'px';
+      checkAutoConnect(p.id);
       updateConnections();
     }
     function onUp(){
@@ -872,6 +1047,7 @@ function addNode(p,x,y){
       document.body.classList.remove('dragging-active');
       document.removeEventListener('mousemove',onMove);
       document.removeEventListener('mouseup',onUp);
+      saveState();
     }
     document.addEventListener('mousemove',onMove);
     document.addEventListener('mouseup',onUp);
@@ -893,6 +1069,7 @@ function removeNode(id){
   n.el.remove();delete nodes[id];
   conns=conns.filter(c=>{if(c.from===id||c.to===id){c.el.remove();return false;}return true;});
   renderPool();
+  saveState();
 }
 
 function addConnection(fromId,fromSide,toId,toSide){
@@ -904,6 +1081,7 @@ function addConnection(fromId,fromSide,toId,toSide){
   svgEl.appendChild(path);
   conns.push({from:fromId,to:toId,fromSide,toSide,el:path});
   updateConnections();
+  saveState();
 }
 function updateConnections(){
   conns.forEach(c=>{
@@ -975,11 +1153,12 @@ function toggleConnectMode(){
   if(!connMode){connFrom=null;tempLine.style.display='none';setHint('Arrossega post-its · ESPAI per navegar · Roda per zoom · «Connectar» per línies');}
   else setHint('Fes clic al port ● per iniciar una connexió');
 }
-function clearLines(){conns.forEach(c=>c.el.remove());conns=[];}
+function clearLines(){conns.forEach(c=>c.el.remove());conns=[];saveState();}
 function clearAll(){
   if(!confirm('Esborrar tot el canvas?')) return;
   clearLines();Object.values(nodes).forEach(n=>n.el.remove());nodes={};
   connFrom=null;tempLine.style.display='none';renderPool();
+  saveState();
 }
 function setHint(t){document.getElementById('tool-hint').textContent=t;}
 
@@ -987,7 +1166,7 @@ function setHint(t){document.getElementById('tool-hint').textContent=t;}
 function openCustomModal(){
   document.getElementById('ci-title').value='';
   document.getElementById('ci-sub').value='';
-  document.getElementById('ci-pain').checked=false;
+  document.getElementById('ci-pain').checked=true;
   selectedLane='teal';
   document.querySelectorAll('.lane-opt').forEach(el=>el.className='lane-opt'+(el.dataset.lane==='teal'?' sel-teal':''));
   document.getElementById('custom-modal').classList.add('open');
@@ -1017,6 +1196,7 @@ function saveCustomPostit(){
     addNode(p, (r.width/2 - panX)/zoom - 70, (r.height/2 - panY)/zoom - 30);
   }
   closeCustomModal();renderPool();
+  saveState();
 }
 document.getElementById('custom-modal').addEventListener('click',e=>{if(e.target.id==='custom-modal') closeCustomModal();});
 document.getElementById('ci-title').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();document.getElementById('ci-sub').focus();}if(e.key==='Escape') closeCustomModal();});
@@ -1076,6 +1256,7 @@ function saveCustomDoc(){
     addNode(p, (r.width/2 - panX)/zoom - 70, (r.height/2 - panY)/zoom - 30);
   }
   closeDocModal();renderPool();
+  saveState();
 }
 
 document.getElementById('doc-modal').addEventListener('click',e=>{if(e.target.id==='doc-modal') closeDocModal();});
@@ -1225,7 +1406,26 @@ function techHint(t){
 function fsync(id,camp,valor){
   const f=fitxes.find(x=>x.id===id);if(!f) return;
   f[camp]=valor;
-  if(['titol','carril','fase'].includes(camp)) renderFitxaSidebar();
+  if(['titol','carril','fase'].includes(camp)) {
+    renderFitxaSidebar();
+    const n = nodes['pain-node-' + id];
+    if (n) {
+      const ntEl = n.el.querySelector('.nt');
+      if (ntEl) {
+        ntEl.textContent = valor || '#' + f.num;
+        ntEl.title = valor || 'FITXA #' + f.num;
+      }
+    }
+    const tn = tipusNodes['pain-node-' + id];
+    if (tn) {
+      const ntEl = tn.el.querySelector('.nt');
+      if (ntEl) {
+        ntEl.textContent = valor || '#' + f.num;
+        ntEl.title = valor || 'FITXA #' + f.num;
+      }
+    }
+  }
+  saveState();
 }
 function selTech(id,val,el){
   const f=fitxes.find(x=>x.id===id);if(!f) return;
@@ -1233,12 +1433,14 @@ function selTech(id,val,el){
   el.closest('.tech-group').querySelectorAll('.tech-pill').forEach(p=>p.className='tech-pill');
   el.classList.add('sel-'+val);
   document.getElementById('tech-hint').textContent=techHint(val);
+  saveState();
 }
 function selRisk(id,val,el){
   const f=fitxes.find(x=>x.id===id);if(!f) return;
   f.risc=val;
   el.closest('.risk-group').querySelectorAll('.risk-opt').forEach(r=>r.className='risk-opt');
   el.classList.add('sel-'+val);
+  saveState();
 }
 function selTypology(id,val,el){
   const f=fitxes.find(x=>x.id===id);if(!f) return;
@@ -1253,19 +1455,24 @@ function selTypology(id,val,el){
     el.classList.add('sel-'+val);
   }
   renderFitxaSidebar();
+  saveState();
 }
 function saveFitxaActive(){
   if(!activaId) return;
   const f=fitxes.find(x=>x.id===activaId);if(!f) return;
   [['f-titol','titol'],['f-desc','descripcio'],['f-freq','frequencia'],['f-temps','temps_min'],['f-causa','causa'],['f-impacte','impacte'],['f-notes','notes']].forEach(([elId,camp])=>{const el=document.getElementById(elId);if(el) f[camp]=el.value;});
   [['f-carril','carril'],['f-fase','fase'],['f-ufreq','unitat_freq']].forEach(([elId,camp])=>{const el=document.getElementById(elId);if(el) f[camp]=el.value;});
+  saveState();
 }
 function eliminarFitxa(id){
   if(!confirm('Eliminar aquesta fitxa?')) return;
   fitxes=fitxes.filter(f=>f.id!==id);
   activaId=null;
   renderFitxaSidebar();
+  removePainNode(id);
+  removeTipusPainNode(id);
   document.getElementById('fitxa-editor').innerHTML=`<div class="empty-state"><div class="empty-icon">⚠</div><strong style="font-size:14px;color:var(--text2)">Cap fitxa seleccionada</strong><p>Crea una fitxa per cada punt de dolor identificat.</p><button class="btn btn-teal" onclick="novaFitxa()" style="margin-top:8px">+ Nova fitxa</button></div>`;
+  saveState();
 }
 
 /* utils */
@@ -1304,7 +1511,11 @@ function resetTipusView(){
 function addTipusNode(p, x, y) {
   const css = LANE_CSS[p.lane] || 'p-gray';
   const el = document.createElement('div');
-  el.className = 'node ' + css;
+  let nodeCss = css;
+  if (p.docType) {
+    nodeCss = 'node-doc node-doc-' + p.docType;
+  }
+  el.className = 'node ' + nodeCss;
   el.id = 'tipus-node-' + p.id;
   el.style.left = x + 'px'; el.style.top = y + 'px';
   el.draggable = false;
@@ -1315,7 +1526,8 @@ function addTipusNode(p, x, y) {
     '<span class="doc-badge doc-badge-db">🗄️ Base de dades</span>'
   ) : '';
 
-  el.innerHTML = `${p.pain ? '<div class="nd">!</div>' : ''}${docBadge}<div class="nt">${esc(p.title)}</div><div class="ns">${esc(p.sub)}</div>`;
+  const foldHtml = p.docType ? '<div class="node-doc-fold"></div>' : '';
+  el.innerHTML = `${foldHtml}${docBadge}<div class="nt">${esc(p.title)}</div><div class="ns">${esc(p.sub)}</div>`;
   canvasContentTipus.appendChild(el);
   tipusNodes[p.id] = { id: p.id, x, y, el };
 
@@ -1330,6 +1542,7 @@ function addTipusNode(p, x, y) {
       tipusNodes[p.id].x = snx + (ev.clientX - sx) / tipusZoom;
       tipusNodes[p.id].y = sny + (ev.clientY - sy) / tipusZoom;
       el.style.left = tipusNodes[p.id].x + 'px'; el.style.top = tipusNodes[p.id].y + 'px';
+      checkAutoConnectTipus(p.id);
       updateTipusConnections();
     }
     function onUp() {
@@ -1495,6 +1708,10 @@ function downloadSVG() {
     purple: { bg: '#f0edfa', bd: '#d2c8f0', tx: '#6d4fc7' },
     gray:   { bg: '#efeeec', bd: '#d6d5d2', tx: '#5e5d59' },
     sys:    { bg: '#efeeec', bd: '#d6d5d2', tx: '#5e5d59' },
+    word:   { bg: '#e8f1fa', bd: '#a6cbef', tx: '#1a6fc4' },
+    excel:  { bg: '#e8f2eb', bd: '#b4dec0', tx: '#1a7a3c' },
+    db:     { bg: '#f0edfa', bd: '#d2c8f0', tx: '#6d4fc7' },
+    pain:   { bg: '#fdf2f2', bd: '#f8b4b4', tx: '#d63232' }
   };
 
   // Helper function to wrap text neatly inside the post-it width
@@ -1566,10 +1783,44 @@ function downloadSVG() {
   // 5. Render Nodes
   let nodesSvg = '';
   activeNodes.forEach(node => {
+    if (node.id.startsWith('pain-node-')) {
+      const f = fitxes.find(x => x.id == node.fitxaId);
+      if (!f) return;
+      
+      const laneColors = COLORS.pain;
+      const nodeX = tab === 'flux' ? (node.x - minX) : node.x;
+      const nodeY = tab === 'flux' ? (node.y - minY) : node.y;
+      const w = 140;
+      const h = node.el.offsetHeight || 60;
+      
+      nodesSvg += `  <!-- Pain Node ${f.id} -->\n`;
+      nodesSvg += `  <g transform="translate(${nodeX}, ${nodeY})" font-family="'DM Sans', sans-serif">\n`;
+      nodesSvg += `    <rect width="${w}" height="${h}" rx="6" ry="6" fill="${laneColors.bg}" stroke="${laneColors.bd}" stroke-width="1.2" />\n`;
+      
+      let textYOffset = 18;
+      // Draw Title (nt)
+      const titleLines = wrapText(f.titol || `Punt de dolor #${f.num}`, 19);
+      nodesSvg += `    <text x="9" y="${textYOffset}" fill="${laneColors.tx}" font-size="10.2" font-weight="bold">\n`;
+      titleLines.forEach((line, index) => {
+        nodesSvg += `      <tspan x="9" dy="${index === 0 ? 0 : 12}">${escSVG(line)}</tspan>\n`;
+      });
+      nodesSvg += `    </text>\n`;
+      
+      textYOffset += (titleLines.length * 12) + 2;
+      
+      // Draw Subtitle (ns)
+      nodesSvg += `    <text x="9" y="${textYOffset}" fill="#5e5d59" font-size="8.5" opacity="0.8">\n`;
+      nodesSvg += `      <tspan x="9" dy="0">Punt de dolor #${String(f.num).padStart(2,'0')}</tspan>\n`;
+      nodesSvg += `    </text>\n`;
+      
+      nodesSvg += `  </g>\n`;
+      return;
+    }
+    
     const p = POSTITS.find(x => x.id === node.id);
     if (!p) return;
     
-    const laneColors = COLORS[p.lane] || COLORS.gray;
+    const laneColors = p.pain ? COLORS.pain : (p.docType ? COLORS[p.docType] : (COLORS[p.lane] || COLORS.gray));
     const nodeX = tab === 'flux' ? (node.x - minX) : node.x;
     const nodeY = tab === 'flux' ? (node.y - minY) : node.y;
     const w = 140;
@@ -1578,8 +1829,14 @@ function downloadSVG() {
     nodesSvg += `  <!-- Node ${p.id} -->\n`;
     nodesSvg += `  <g transform="translate(${nodeX}, ${nodeY})" font-family="'DM Sans', sans-serif">\n`;
     
-    // Draw card background
-    nodesSvg += `    <rect width="${w}" height="${h}" rx="6" ry="6" fill="${laneColors.bg}" stroke="${laneColors.bd}" stroke-width="1.2" />\n`;
+    // Draw card background (document fold shape or standard card)
+    if (p.docType) {
+      nodesSvg += `    <!-- Document Shape (Clip corner) -->\n`;
+      nodesSvg += `    <polygon points="0,0 126,0 140,14 140,${h} 0,${h}" fill="${laneColors.bg}" stroke="${laneColors.bd}" stroke-width="1.2" />\n`;
+      nodesSvg += `    <polygon points="126,0 126,14 140,14" fill="#ffffff" stroke="${laneColors.bd}" stroke-width="1.2" />\n`;
+    } else {
+      nodesSvg += `    <rect width="${w}" height="${h}" rx="6" ry="6" fill="${laneColors.bg}" stroke="${laneColors.bd}" stroke-width="1.2" />\n`;
+    }
     
     let textYOffset = 18;
     // Draw document badge
@@ -1611,12 +1868,6 @@ function downloadSVG() {
         nodesSvg += `      <tspan x="9" dy="${index === 0 ? 0 : 10}">${escSVG(line)}</tspan>\n`;
       });
       nodesSvg += `    </text>\n`;
-    }
-    
-    // Draw Pain indicator dot
-    if (p.pain) {
-      nodesSvg += `    <circle cx="${w - 2}" cy="2" r="7" fill="#d63232" />\n`;
-      nodesSvg += `    <text x="${w - 2}" y="5.2" fill="#ffffff" font-size="9.5" font-weight="bold" text-anchor="middle">!</text>\n`;
     }
     
     nodesSvg += `  </g>\n`;
@@ -1653,9 +1904,485 @@ ${nodesSvg}
   URL.revokeObjectURL(url);
 }
 
+/* ═══════════════════════════════════════════════════════════
+   CONSIGNAR NODE
+   Draggable Red circular Pain nodes logic, Auto-connect,
+   and pool synchronizations.
+ ═══════════════════════════════════════════════════════════ */
+function consignarNode(nodeId, event) {
+  const p = POSTITS.find(x => x.id === nodeId);
+  if (!p) return;
+  novaFitxa();
+  const f = fitxes[fitxes.length - 1];
+  f.titol = p.title;
+  renderFitxaSidebar();
+}
+
+function addPainNode(f, x, y) {
+  const el = document.createElement('div');
+  el.className = 'node node-pain-node';
+  el.id = 'node-pain-node-' + f.id;
+  el.style.left = x + 'px'; el.style.top = y + 'px';
+  el.draggable = false;
+  
+  el.innerHTML = `
+    <div class="nt">${esc(f.titol || 'Punt de dolor')}</div>
+    <div class="ns">Punt de dolor #${String(f.num).padStart(2,'0')}</div>
+    <button class="del">×</button>
+    <div class="port" data-side="right"></div>
+    <div class="port" data-side="left"></div>
+    <div class="port" data-side="top"></div>
+    <div class="port" data-side="bottom"></div>
+  `;
+  canvasContent.appendChild(el);
+  nodes['pain-node-' + f.id] = { id: 'pain-node-' + f.id, fitxaId: f.id, x, y, el };
+  
+  setupPainNodeHandlers('pain-node-' + f.id, f, false);
+  saveState();
+}
+
+function addTipusPainNode(f, x, y) {
+  const el = document.createElement('div');
+  el.className = 'node node-pain-node';
+  el.id = 'tipus-node-pain-node-' + f.id;
+  el.style.left = x + 'px'; el.style.top = y + 'px';
+  el.draggable = false;
+  
+  el.innerHTML = `
+    <div class="nt">${esc(f.titol || 'Punt de dolor')}</div>
+    <div class="ns">Punt de dolor #${String(f.num).padStart(2,'0')}</div>
+    <button class="del">×</button>
+  `;
+  canvasContentTipus.appendChild(el);
+  tipusNodes['pain-node-' + f.id] = { id: 'pain-node-' + f.id, fitxaId: f.id, x, y, el };
+  
+  setupPainNodeHandlers('pain-node-' + f.id, f, true);
+  saveState();
+}
+
+function setupPainNodeHandlers(nodeKey, f, isTipus) {
+  const nodeObj = isTipus ? tipusNodes[nodeKey] : nodes[nodeKey];
+  const el = nodeObj.el;
+  
+  el.querySelector('.del').addEventListener('mousedown', e => e.stopPropagation());
+  el.querySelector('.del').addEventListener('click', e => {
+    e.stopPropagation();
+    if (isTipus) {
+      removeTipusPainNode(f.id);
+    } else {
+      removePainNode(f.id);
+    }
+  });
+  
+  el.addEventListener('dblclick', e => {
+    obrirFitxa(f.id);
+    switchTab('fitxa');
+  });
+  
+  if (!isTipus) {
+    el.querySelectorAll('.port').forEach(portEl => {
+      portEl.addEventListener('mousedown', e => {
+        e.stopPropagation(); e.preventDefault();
+        if (!connMode) return;
+        const side = portEl.dataset.side;
+        connFrom = { id: nodeKey, side };
+        const pos = nodeEdge(nodeKey, side);
+        tempLine.setAttribute('x1', pos.x); tempLine.setAttribute('y1', pos.y);
+        tempLine.setAttribute('x2', pos.x); tempLine.setAttribute('y2', pos.y);
+        tempLine.style.display = 'block';
+      });
+    });
+  }
+  
+  el.addEventListener('mousedown', e => {
+    if (e.target.classList.contains('del')) return;
+    if (e.target.classList.contains('port')) {
+      if (connMode && connFrom && connFrom.id !== nodeKey) {
+        addConnection(connFrom.id, connFrom.side, nodeKey, e.target.dataset.side);
+        connFrom = null; tempLine.style.display = 'none';
+      }
+      return;
+    }
+    if (isTipus) {
+      if (e.button !== 0) return;
+      const sx = e.clientX, sy = e.clientY, snx = tipusNodes[nodeKey].x, sny = tipusNodes[nodeKey].y;
+      el.classList.add('dragging-node');
+      document.body.classList.add('dragging-active');
+      e.preventDefault(); e.stopPropagation();
+      
+      function onMove(ev) {
+        ev.preventDefault();
+        tipusNodes[nodeKey].x = snx + (ev.clientX - sx) / tipusZoom;
+        tipusNodes[nodeKey].y = sny + (ev.clientY - sy) / tipusZoom;
+        el.style.left = tipusNodes[nodeKey].x + 'px'; el.style.top = tipusNodes[nodeKey].y + 'px';
+        
+        checkAutoConnectTipus(nodeKey);
+        updateTipusConnections();
+      }
+      
+      function onUp() {
+        el.classList.remove('dragging-node');
+        document.body.classList.remove('dragging-active');
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+        saveState();
+      }
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
+    } else {
+      if (panMode || e.button !== 0) return;
+      const sx = e.clientX, sy = e.clientY, snx = nodes[nodeKey].x, sny = nodes[nodeKey].y;
+      el.classList.add('dragging-node');
+      document.body.classList.add('dragging-active');
+      e.preventDefault(); e.stopPropagation();
+      
+      function onMove(ev) {
+        ev.preventDefault();
+        nodes[nodeKey].x = snx + (ev.clientX - sx) / zoom;
+        nodes[nodeKey].y = sny + (ev.clientY - sy) / zoom;
+        el.style.left = nodes[nodeKey].x + 'px'; el.style.top = nodes[nodeKey].y + 'px';
+        
+        checkAutoConnect(nodeKey);
+        updateConnections();
+      }
+      
+      function onUp() {
+        el.classList.remove('dragging-node');
+        document.body.classList.remove('dragging-active');
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+        saveState();
+      }
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
+    }
+  });
+}
+
+function removePainNode(fitxaId) {
+  const n = nodes['pain-node-' + fitxaId];
+  if (!n) return;
+  n.el.remove();
+  delete nodes['pain-node-' + fitxaId];
+  conns = conns.filter(c => {
+    if (c.from === 'pain-node-' + fitxaId || c.to === 'pain-node-' + fitxaId) {
+      c.el.remove();
+      return false;
+    }
+    return true;
+  });
+  saveState();
+}
+
+function removeTipusPainNode(fitxaId) {
+  const n = tipusNodes['pain-node-' + fitxaId];
+  if (!n) return;
+  n.el.remove();
+  delete tipusNodes['pain-node-' + fitxaId];
+  tipusConns = tipusConns.filter(c => {
+    if (c.from === 'pain-node-' + fitxaId || c.to === 'pain-node-' + fitxaId) {
+      c.el.remove();
+      return false;
+    }
+    return true;
+  });
+  saveState();
+}
+
+function checkAutoConnect(nodeId) {
+  const node = nodes[nodeId];
+  if (!node) return;
+  
+  const isPain = nodeId.startsWith('pain-node-');
+  const thisCenter = nodeCenter(nodeId);
+  if (!thisCenter) return;
+  
+  let closestId = null;
+  let minD = 140;
+  
+  Object.keys(nodes).forEach(otherId => {
+    if (otherId === nodeId) return;
+    const otherIsPain = otherId.startsWith('pain-node-');
+    if (isPain === otherIsPain) return;
+    
+    const otherCenter = nodeCenter(otherId);
+    if (!otherCenter) return;
+    
+    const d = Math.hypot(otherCenter.x - thisCenter.x, otherCenter.y - thisCenter.y);
+    if (d < minD) {
+      minD = d;
+      closestId = otherId;
+    }
+  });
+  
+  if (closestId) {
+    const fromId = isPain ? closestId : nodeId;
+    const toId = isPain ? nodeId : closestId;
+    
+    if (!conns.find(c => c.from === fromId && c.to === toId)) {
+      const painId = isPain ? nodeId : closestId;
+      conns = conns.filter(c => {
+        if (c.from === painId || c.to === painId) {
+          c.el.remove();
+          return false;
+        }
+        return true;
+      });
+      
+      const fromSide = closestSide(fromId, nodeCenter(toId));
+      const toSide = closestSide(toId, nodeCenter(fromId));
+      
+      addConnection(fromId, fromSide, toId, toSide);
+    }
+  }
+}
+
+function checkAutoConnectTipus(nodeId) {
+  const node = tipusNodes[nodeId];
+  if (!node) return;
+  
+  const isPain = nodeId.startsWith('pain-node-');
+  const thisCenter = tipusNodeCenter(nodeId);
+  if (!thisCenter) return;
+  
+  let closestId = null;
+  let minD = 140;
+  
+  Object.keys(tipusNodes).forEach(otherId => {
+    if (otherId === nodeId) return;
+    const otherIsPain = otherId.startsWith('pain-node-');
+    if (isPain === otherIsPain) return;
+    
+    const otherCenter = tipusNodeCenter(otherId);
+    if (!otherCenter) return;
+    
+    const d = Math.hypot(otherCenter.x - thisCenter.x, otherCenter.y - thisCenter.y);
+    if (d < minD) {
+      minD = d;
+      closestId = otherId;
+    }
+  });
+  
+  if (closestId) {
+    const fromId = isPain ? closestId : nodeId;
+    const toId = isPain ? nodeId : closestId;
+    
+    if (!tipusConns.find(c => c.from === fromId && c.to === toId)) {
+      const painId = isPain ? nodeId : closestId;
+      tipusConns = tipusConns.filter(c => {
+        if (c.from === painId || c.to === painId) {
+          c.el.remove();
+          return false;
+        }
+        return true;
+      });
+      
+      addTipusConnection(fromId, toId);
+      updateTipusConnections();
+      saveState();
+    }
+  }
+}
+
+let selectedPainLane = 'teal';
+function openPainModal() {
+  document.getElementById('cp-title').value = '';
+  selectedPainLane = 'teal';
+  
+  document.querySelectorAll('#pain-lane-opts .lane-opt').forEach(el => {
+    el.className = 'lane-opt' + (el.dataset.lane === 'teal' ? ' sel-teal' : '');
+  });
+  
+  document.getElementById('pain-modal').classList.add('open');
+  setTimeout(() => document.getElementById('cp-title').focus(), 80);
+}
+
+function closePainModal() {
+  document.getElementById('pain-modal').classList.remove('open');
+}
+
+function selectPainLane(lane, el) {
+  selectedPainLane = lane;
+  document.querySelectorAll('#pain-lane-opts .lane-opt').forEach(o => o.className = 'lane-opt');
+  el.classList.add('sel-' + lane);
+}
+
+function saveCustomPain() {
+  const title = document.getElementById('cp-title').value.trim();
+  if (!title) {
+    document.getElementById('cp-title').focus();
+    return;
+  }
+  
+  const id = Date.now();
+  const num = fitxaCounter++;
+  
+  const F_LANES = {
+    blue: 'Empresa licitadora',
+    teal: 'Secretaria · Contractació',
+    purple: 'Mesa de contractació',
+    gray: 'Intervenció · Tresoreria',
+    sys: 'Sistemes · Tecnologies'
+  };
+  const carrilNom = F_LANES[selectedPainLane] || '';
+  
+  const f = {
+    id,
+    num,
+    titol: title,
+    carril: carrilNom,
+    fase: '',
+    descripcio: '',
+    frequencia: '',
+    unitat_freq: 'per expedient',
+    temps_min: '',
+    causa: '',
+    impacte: '',
+    tecnologia: '',
+    risc: '',
+    notes: 'Creat des de la finestra de diàleg de punts de dolor.',
+    tipologia: ''
+  };
+  
+  fitxes.push(f);
+  renderFitxaSidebar();
+  
+  if (currentTab === 'tipus') {
+    const r = canvasTipus.getBoundingClientRect();
+    const x = (r.width / 2 - tipusPanX) / tipusZoom - 35;
+    const y = (r.height / 2 - tipusPanY) / tipusZoom - 35;
+    addTipusPainNode(f, x, y);
+    checkAutoConnectTipus('pain-node-' + f.id);
+  } else {
+    const r = canvas.getBoundingClientRect();
+    const x = (r.width / 2 - panX) / zoom - 35;
+    const y = (r.height / 2 - panY) / zoom - 35;
+    addPainNode(f, x, y);
+    checkAutoConnect('pain-node-' + f.id);
+  }
+  
+  closePainModal();
+  saveState();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   LOCALSTORAGE STATE PERSISTENCE
+ ═══════════════════════════════════════════════════════════ */
+function saveState() {
+  localStorage.setItem('pos_fitxes', JSON.stringify(fitxes));
+  localStorage.setItem('pos_fitxaCounter', fitxaCounter);
+  localStorage.setItem('pos_customCounter', customCounter);
+  localStorage.setItem('pos_POSTITS', JSON.stringify(POSTITS.filter(p => p.custom)));
+  
+  const canvasNodes = Object.values(nodes).map(n => ({ id: n.id, x: n.x, y: n.y, fitxaId: n.fitxaId }));
+  localStorage.setItem('pos_canvasNodes', JSON.stringify(canvasNodes));
+  
+  const canvasConns = conns.map(c => ({ from: c.from, to: c.to, fromSide: c.fromSide, toSide: c.toSide }));
+  localStorage.setItem('pos_canvasConns', JSON.stringify(canvasConns));
+  
+  // Save typical procedure pain nodes
+  const tipusPainNodes = Object.values(tipusNodes)
+    .filter(n => n.id.startsWith('pain-node-'))
+    .map(n => ({ id: n.id, x: n.x, y: n.y, fitxaId: n.fitxaId }));
+  localStorage.setItem('pos_tipusPainNodes', JSON.stringify(tipusPainNodes));
+  
+  // Save typical procedure connections
+  const savedTipusConns = tipusConns
+    .filter(c => c.from.startsWith('pain-node-') || c.to.startsWith('pain-node-'))
+    .map(c => ({ from: c.from, to: c.to }));
+  localStorage.setItem('pos_tipusPainConns', JSON.stringify(savedTipusConns));
+}
+
+function loadState() {
+  try {
+    const savedFitxes = localStorage.getItem('pos_fitxes');
+    if (savedFitxes) {
+      fitxes = JSON.parse(savedFitxes);
+    }
+    
+    const savedFitxaCounter = localStorage.getItem('pos_fitxaCounter');
+    if (savedFitxaCounter) {
+      fitxaCounter = parseInt(savedFitxaCounter, 10);
+    }
+    
+    const savedCustomCounter = localStorage.getItem('pos_customCounter');
+    if (savedCustomCounter) {
+      customCounter = parseInt(savedCustomCounter, 10);
+    }
+    
+    const savedCustomPostits = localStorage.getItem('pos_POSTITS');
+    if (savedCustomPostits) {
+      const parsed = JSON.parse(savedCustomPostits);
+      parsed.forEach(p => {
+        if (!POSTITS.find(x => x.id === p.id)) {
+          POSTITS.push(p);
+        }
+      });
+    }
+    
+    const savedCanvasNodes = localStorage.getItem('pos_canvasNodes');
+    if (savedCanvasNodes) {
+      const parsedNodes = JSON.parse(savedCanvasNodes);
+      parsedNodes.forEach(n => {
+        if (n.id.startsWith('pain-node-')) {
+          const f = fitxes.find(x => x.id == n.fitxaId);
+          if (f && !nodes[n.id]) {
+            addPainNode(f, n.x, n.y);
+          }
+        } else {
+          const p = POSTITS.find(x => x.id === n.id);
+          if (p && !nodes[n.id]) {
+            addNode(p, n.x, n.y);
+          }
+        }
+      });
+    }
+    
+    const savedCanvasConns = localStorage.getItem('pos_canvasConns');
+    if (savedCanvasConns) {
+      const parsedConns = JSON.parse(savedCanvasConns);
+      setTimeout(() => {
+        parsedConns.forEach(c => {
+          addConnection(c.from, c.fromSide, c.to, c.toSide);
+        });
+      }, 50);
+    }
+    
+    // Load typical procedure pain nodes
+    const savedTipusPainNodes = localStorage.getItem('pos_tipusPainNodes');
+    if (savedTipusPainNodes) {
+      const parsedNodes = JSON.parse(savedTipusPainNodes);
+      parsedNodes.forEach(n => {
+        const f = fitxes.find(x => x.id == n.fitxaId);
+        if (f && !tipusNodes['pain-node-' + f.id]) {
+          addTipusPainNode(f, n.x, n.y);
+        }
+      });
+    }
+    
+    // Load typical procedure pain connections
+    const savedTipusPainConns = localStorage.getItem('pos_tipusPainConns');
+    if (savedTipusPainConns) {
+      const parsedConns = JSON.parse(savedTipusPainConns);
+      setTimeout(() => {
+        parsedConns.forEach(c => {
+          if (!tipusConns.find(tc => tc.from === c.from && tc.to === c.to)) {
+            addTipusConnection(c.from, c.to);
+          }
+        });
+        updateTipusConnections();
+      }, 150);
+    }
+  } catch (e) {
+    console.error('Error loading saved state:', e);
+  }
+}
+
 /* init */
+loadState();
 renderPool();
 initProcedimentTipus();
+renderFitxaSidebar();
 </script>
 </body>
 </html>
