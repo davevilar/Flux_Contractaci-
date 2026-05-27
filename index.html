@@ -651,7 +651,7 @@ body.dragging-active{user-select:none;-webkit-user-select:none;cursor:grabbing!i
       </div>
       <div class="fab-group">
         <div class="fab-item">
-          <button class="fab-btn fab-pain" onclick="openPainModal()" title="Crear punt de dolor">+</button>
+          <button class="fab-btn fab-pain" onclick="crearPuntDeDolorFAB()" title="Crear punt de dolor">+</button>
           <span class="fab-label">Afegeix punt de dolor</span>
         </div>
         <div class="fab-item">
@@ -690,7 +690,7 @@ body.dragging-active{user-select:none;-webkit-user-select:none;cursor:grabbing!i
       </div>
       <div class="fab-group">
         <div class="fab-item">
-          <button class="fab-btn fab-pain" onclick="openPainModal()" title="Crear punt de dolor">+</button>
+          <button class="fab-btn fab-pain" onclick="crearPuntDeDolorFAB()" title="Crear punt de dolor">+</button>
           <span class="fab-label">Afegeix punt de dolor</span>
         </div>
         <div class="fab-item">
@@ -800,30 +800,7 @@ body.dragging-active{user-select:none;-webkit-user-select:none;cursor:grabbing!i
   </div>
 </div>
 
-<!-- ══ MODAL: custom pain point ══ -->
-<div class="modal-back" id="pain-modal">
-  <div class="modal">
-    <h3>Nou punt de dolor</h3>
-    <p>Crea un nou punt de dolor i afegeix-lo al canvas.</p>
-    
-    <label class="mlabel">Títol del punt de dolor</label>
-    <input id="cp-title" type="text" placeholder="Ex: Introducció manual de dades...">
-    
-    <label class="mlabel" style="margin-top:10px">Qui ho fa (opcional)</label>
-    <div class="lane-opts" id="pain-lane-opts">
-      <div class="lane-opt" data-lane="blue"   onclick="selectPainLane('blue',this)">Empresa licitadora</div>
-      <div class="lane-opt sel-teal" data-lane="teal" onclick="selectPainLane('teal',this)">Secretaria · Contractació</div>
-      <div class="lane-opt" data-lane="purple" onclick="selectPainLane('purple',this)">Mesa de contractació</div>
-      <div class="lane-opt" data-lane="gray"   onclick="selectPainLane('gray',this)">Intervenció · Tresoreria</div>
-      <div class="lane-opt" data-lane="sys"    onclick="selectPainLane('sys',this)">Sistemes · Tecnologies</div>
-    </div>
-
-    <div style="display:flex;gap:7px;justify-content:flex-end;margin-top:12px;">
-      <button class="btn" onclick="closePainModal()">Cancel·lar</button>
-      <button class="btn btn-red" onclick="saveCustomPain()">Afegir al canvas</button>
-    </div>
-  </div>
-</div>
+<!-- pain-modal completely removed -->
 
 <script>
 /* ═══════════════════════════════════════════════════════════
@@ -1274,10 +1251,27 @@ let fitxes=[],activaId=null,fitxaCounter=1;
 
 function novaFitxa(){
   const id=Date.now();
-  fitxes.push({id,num:fitxaCounter++,titol:'',carril:'',fase:'',descripcio:'',frequencia:'',unitat_freq:'per expedient',temps_min:'',causa:'',impacte:'',tecnologia:'',risc:'',notes:'',tipologia:''});
+  const f = {id,num:fitxaCounter++,titol:'',carril:'',fase:'',descripcio:'',frequencia:'',unitat_freq:'per expedient',temps_min:'',causa:'',impacte:'',tecnologia:'',risc:'',notes:'Creat des de la barra lateral.',tipologia:''};
+  fitxes.push(f);
   renderFitxaSidebar();
   obrirFitxa(id);
   document.getElementById('tab-fitxa').querySelector('.tb').textContent=fitxes.length;
+  
+  if (currentTab === 'tipus') {
+    const r = canvasTipus.getBoundingClientRect();
+    const x = (r.width / 2 - tipusPanX) / tipusZoom - 70;
+    const y = (r.height / 2 - tipusPanY) / tipusZoom - 30;
+    addTipusPainNode(f, x, y);
+    checkAutoConnectTipus('pain-node-' + f.id);
+  } else {
+    const r = canvas.getBoundingClientRect();
+    const x = (r.width / 2 - panX) / zoom - 70;
+    const y = (r.height / 2 - panY) / zoom - 30;
+    addPainNode(f, x, y);
+    checkAutoConnect('pain-node-' + f.id);
+  }
+  
+  saveState();
 }
 
 function getTypoBadge(t) {
@@ -2184,53 +2178,13 @@ function checkAutoConnectTipus(nodeId) {
   }
 }
 
-let selectedPainLane = 'teal';
-function openPainModal() {
-  document.getElementById('cp-title').value = '';
-  selectedPainLane = 'teal';
-  
-  document.querySelectorAll('#pain-lane-opts .lane-opt').forEach(el => {
-    el.className = 'lane-opt' + (el.dataset.lane === 'teal' ? ' sel-teal' : '');
-  });
-  
-  document.getElementById('pain-modal').classList.add('open');
-  setTimeout(() => document.getElementById('cp-title').focus(), 80);
-}
-
-function closePainModal() {
-  document.getElementById('pain-modal').classList.remove('open');
-}
-
-function selectPainLane(lane, el) {
-  selectedPainLane = lane;
-  document.querySelectorAll('#pain-lane-opts .lane-opt').forEach(o => o.className = 'lane-opt');
-  el.classList.add('sel-' + lane);
-}
-
-function saveCustomPain() {
-  const title = document.getElementById('cp-title').value.trim();
-  if (!title) {
-    document.getElementById('cp-title').focus();
-    return;
-  }
-  
+function crearPuntDeDolorFAB() {
   const id = Date.now();
-  const num = fitxaCounter++;
-  
-  const F_LANES = {
-    blue: 'Empresa licitadora',
-    teal: 'Secretaria · Contractació',
-    purple: 'Mesa de contractació',
-    gray: 'Intervenció · Tresoreria',
-    sys: 'Sistemes · Tecnologies'
-  };
-  const carrilNom = F_LANES[selectedPainLane] || '';
-  
   const f = {
     id,
-    num,
-    titol: title,
-    carril: carrilNom,
+    num: fitxaCounter++,
+    titol: '',
+    carril: '',
     fase: '',
     descripcio: '',
     frequencia: '',
@@ -2240,28 +2194,28 @@ function saveCustomPain() {
     impacte: '',
     tecnologia: '',
     risc: '',
-    notes: 'Creat des de la finestra de diàleg de punts de dolor.',
+    notes: 'Creat des del diagrama de flux.',
     tipologia: ''
   };
-  
   fitxes.push(f);
   renderFitxaSidebar();
   
   if (currentTab === 'tipus') {
     const r = canvasTipus.getBoundingClientRect();
-    const x = (r.width / 2 - tipusPanX) / tipusZoom - 35;
-    const y = (r.height / 2 - tipusPanY) / tipusZoom - 35;
+    const x = (r.width / 2 - tipusPanX) / tipusZoom - 70;
+    const y = (r.height / 2 - tipusPanY) / tipusZoom - 30;
     addTipusPainNode(f, x, y);
     checkAutoConnectTipus('pain-node-' + f.id);
   } else {
     const r = canvas.getBoundingClientRect();
-    const x = (r.width / 2 - panX) / zoom - 35;
-    const y = (r.height / 2 - panY) / zoom - 35;
+    const x = (r.width / 2 - panX) / zoom - 70;
+    const y = (r.height / 2 - panY) / zoom - 30;
     addPainNode(f, x, y);
     checkAutoConnect('pain-node-' + f.id);
   }
   
-  closePainModal();
+  obrirFitxa(id);
+  switchTab('fitxa');
   saveState();
 }
 
