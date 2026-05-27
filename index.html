@@ -467,6 +467,7 @@ body.dragging-active{user-select:none;-webkit-user-select:none;cursor:grabbing!i
     <button class="btn" id="clear-conns-btn" onclick="clearLines()">✕ Connexions</button>
     <button class="btn" id="clear-all-btn" onclick="clearAll()">↺ Reiniciar</button>
     <button class="btn btn-teal" onclick="printCurrent()">🖨</button>
+    <button class="btn btn-teal" id="download-btn" onclick="downloadSVG()">📥 Descarregar</button>
   </div>
 </nav>
 
@@ -674,6 +675,11 @@ function switchTab(tab) {
     const el = document.getElementById(id);
     if (el) el.style.display = tab === 'flux' ? '' : 'none';
   });
+
+  const downloadBtn = document.getElementById('download-btn');
+  if (downloadBtn) {
+    downloadBtn.style.display = (tab === 'flux' || tab === 'tipus') ? '' : 'none';
+  }
 }
 
 function printCurrent() { window.print(); }
@@ -1440,6 +1446,212 @@ canvasTipus.addEventListener('wheel', e => {
   tipusPanY = my - wy * tipusZoom;
   applyTipusTransform();
 }, { passive: false });
+
+/* ═══════════════════════════════════════════════════════════
+   SVG EXPORT / DESCARREGA
+ Panchromatic high-fidelity SVG diagram exporter.
+ ═══════════════════════════════════════════════════════════ */
+function downloadSVG() {
+  const tab = currentTab;
+  if (tab !== 'flux' && tab !== 'tipus') return;
+  
+  const activeNodes = tab === 'flux' ? Object.values(nodes) : Object.values(tipusNodes);
+  if (activeNodes.length === 0) {
+    alert('No hi ha post-its al canvas per descarregar!');
+    return;
+  }
+  
+  // 1. Calculate boundaries & canvas size
+  let svgWidth = 7300;
+  let svgHeight = 700;
+  let minX = 0, minY = 0;
+  
+  if (tab === 'flux') {
+    let minXCalculated = Infinity, minYCalculated = Infinity;
+    let maxXCalculated = -Infinity, maxYCalculated = -Infinity;
+    activeNodes.forEach(node => {
+      const w = 140;
+      const h = node.el.offsetHeight || 70;
+      if (node.x < minXCalculated) minXCalculated = node.x;
+      if (node.y < minYCalculated) minYCalculated = node.y;
+      if (node.x + w > maxXCalculated) maxXCalculated = node.x + w;
+      if (node.y + h > maxYCalculated) maxYCalculated = node.y + h;
+    });
+    
+    // Add safety padding of 50px
+    minX = minXCalculated - 50;
+    minY = minYCalculated - 50;
+    const maxX = maxXCalculated + 50;
+    const maxY = maxYCalculated + 50;
+    
+    svgWidth = maxX - minX;
+    svgHeight = maxY - minY;
+  }
+
+  // 2. Base colors lookup for light theme vector export
+  const COLORS = {
+    blue:   { bg: '#e8f1fa', bd: '#b5d3f2', tx: '#1a6fc4' },
+    teal:   { bg: '#e7f2ef', bd: '#b2d7ce', tx: '#0f7a5a' },
+    purple: { bg: '#f0edfa', bd: '#d2c8f0', tx: '#6d4fc7' },
+    gray:   { bg: '#efeeec', bd: '#d6d5d2', tx: '#5e5d59' },
+    sys:    { bg: '#efeeec', bd: '#d6d5d2', tx: '#5e5d59' },
+  };
+
+  // Helper function to wrap text neatly inside the post-it width
+  function wrapText(text, maxChars) {
+    const words = text.split(/\s+/);
+    const lines = [];
+    let currentLine = '';
+    
+    words.forEach(word => {
+      if ((currentLine + ' ' + word).trim().length <= maxChars) {
+        currentLine = (currentLine + ' ' + word).trim();
+      } else {
+        if (currentLine) lines.push(currentLine);
+        currentLine = word;
+      }
+    });
+    if (currentLine) lines.push(currentLine);
+    return lines;
+  }
+
+  function escSVG(s) {
+    return String(s || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&apos;');
+  }
+
+  // 3. Render swimlanes / background
+  let bgSvg = '';
+  let lanesSvg = '';
+  
+  if (tab === 'flux') {
+    bgSvg = `  <!-- Clean paper background -->\n  <rect width="${svgWidth}" height="${svgHeight}" fill="#f9f8f6" />\n`;
+  } else if (tab === 'tipus') {
+    const laneTitles = [
+      { title: 'Empresa licitadora', color: '#1a6fc4' },
+      { title: 'Secretaria · Contractació', color: '#0f7a5a' },
+      { title: 'Mesa de contractació', color: '#6d4fc7' },
+      { title: 'Intervenció · Tresoreria', color: '#5e5d59' },
+      { title: 'Sistemes · Tecnologies', color: '#5e5d59' }
+    ];
+    
+    for (let i = 0; i < 5; i++) {
+      const y = i * 140;
+      const bgCol = i % 2 === 1 ? '#f7f6f4' : '#ffffff';
+      lanesSvg += `  <!-- Carril ${i} -->\n`;
+      lanesSvg += `  <rect x="0" y="${y}" width="${svgWidth}" height="140" fill="${bgCol}" />\n`;
+      lanesSvg += `  <text x="20" y="${y + 25}" fill="${laneTitles[i].color}" font-family="'DM Sans', sans-serif" font-size="10.5" font-weight="bold" opacity="0.45" letter-spacing="0.08em" text-transform="uppercase">${laneTitles[i].title.toUpperCase()}</text>\n`;
+      if (i < 4) {
+        lanesSvg += `  <line x1="0" y1="${y + 140}" x2="${svgWidth}" y2="${y + 140}" stroke="#eceae3" stroke-width="1.2" stroke-dasharray="5 5" />\n`;
+      }
+    }
+  }
+
+  // 4. Render Connection Paths (copy exact SVG path geometry)
+  let pathsSvg = '';
+  const activeConns = tab === 'flux' ? conns : tipusConns;
+  const strokeColor = '#0f7a5a';
+
+  activeConns.forEach(c => {
+    const d = c.el.getAttribute('d');
+    if (d) {
+      pathsSvg += `  <path d="${d}" fill="none" stroke="${strokeColor}" stroke-width="2" marker-end="url(#arrow-head)" opacity="0.75" />\n`;
+    }
+  });
+
+  // 5. Render Nodes
+  let nodesSvg = '';
+  activeNodes.forEach(node => {
+    const p = POSTITS.find(x => x.id === node.id);
+    if (!p) return;
+    
+    const laneColors = COLORS[p.lane] || COLORS.gray;
+    const nodeX = tab === 'flux' ? (node.x - minX) : node.x;
+    const nodeY = tab === 'flux' ? (node.y - minY) : node.y;
+    const w = 140;
+    const h = node.el.offsetHeight || 70;
+    
+    nodesSvg += `  <!-- Node ${p.id} -->\n`;
+    nodesSvg += `  <g transform="translate(${nodeX}, ${nodeY})" font-family="'DM Sans', sans-serif">\n`;
+    
+    // Draw card background
+    nodesSvg += `    <rect width="${w}" height="${h}" rx="6" ry="6" fill="${laneColors.bg}" stroke="${laneColors.bd}" stroke-width="1.2" />\n`;
+    
+    let textYOffset = 18;
+    // Draw document badge
+    if (p.docType) {
+      const badgeCols = p.docType === 'word' ? { bg: 'rgba(26,111,196,0.10)', bd: 'rgba(26,111,196,0.32)', tx: '#1a6fc4', lab: '📄 WORD' } :
+                        p.docType === 'excel' ? { bg: 'rgba(26,122,60,0.08)', bd: 'rgba(26,122,60,0.28)', tx: '#1a7a3c', lab: '📊 EXCEL' } :
+                        { bg: 'rgba(109,79,199,0.10)', bd: 'rgba(109,79,199,0.32)', tx: '#6d4fc7', lab: '🗄️ BD' };
+      
+      nodesSvg += `    <rect x="9" y="8" width="62" height="13" rx="3" ry="3" fill="${badgeCols.bg}" stroke="${badgeCols.bd}" stroke-width="0.8" />\n`;
+      nodesSvg += `    <text x="13" y="17.2" fill="${badgeCols.tx}" font-size="7.5" font-weight="bold">${badgeCols.lab}</text>\n`;
+      textYOffset = 32;
+    }
+    
+    // Draw Title (nt)
+    const titleLines = wrapText(p.title, 19);
+    nodesSvg += `    <text x="9" y="${textYOffset}" fill="${laneColors.tx}" font-size="10.2" font-weight="bold">\n`;
+    titleLines.forEach((line, index) => {
+      nodesSvg += `      <tspan x="9" dy="${index === 0 ? 0 : 12}">${escSVG(line)}</tspan>\n`;
+    });
+    nodesSvg += `    </text>\n`;
+    
+    textYOffset += (titleLines.length * 12) + 2;
+    
+    // Draw Subtitle (ns)
+    if (p.sub) {
+      const subLines = wrapText(p.sub, 23);
+      nodesSvg += `    <text x="9" y="${textYOffset}" fill="#5e5d59" font-size="8.5" opacity="0.8">\n`;
+      subLines.forEach((line, index) => {
+        nodesSvg += `      <tspan x="9" dy="${index === 0 ? 0 : 10}">${escSVG(line)}</tspan>\n`;
+      });
+      nodesSvg += `    </text>\n`;
+    }
+    
+    // Draw Pain indicator dot
+    if (p.pain) {
+      nodesSvg += `    <circle cx="${w - 2}" cy="2" r="7" fill="#d63232" />\n`;
+      nodesSvg += `    <text x="${w - 2}" y="5.2" fill="#ffffff" font-size="9.5" font-weight="bold" text-anchor="middle">!</text>\n`;
+    }
+    
+    nodesSvg += `  </g>\n`;
+  });
+
+  // 6. Compile SVG Markup
+  const svgContent = `<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${svgWidth} ${svgHeight}" width="${svgWidth}" height="${svgHeight}">
+<defs>
+  <marker id="arrow-head" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto" markerUnits="strokeWidth">
+    <path d="M0,0 L0,6 L9,3 z" fill="#0f7a5a"/>
+  </marker>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&amp;display=swap');
+  </style>
+</defs>
+${bgSvg}
+${lanesSvg}
+<g ${tab === 'flux' ? `transform="translate(${-minX}, ${-minY})"` : ''}>
+${pathsSvg}
+</g>
+${nodesSvg}
+</svg>`;
+
+  // 7. Trigger download
+  const blob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = tab === 'tipus' ? 'flux-tipus-simplificat.svg' : 'el-meu-diagrama-de-flux.svg';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
 
 /* init */
 renderPool();
